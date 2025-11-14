@@ -106,7 +106,8 @@ fn test_blocked_cross_origin_workflow() {
     // Then: Should be blocked
     assert!(!result.allowed);
     assert!(result.reason.is_some());
-    assert!(result.reason.unwrap().contains("origin") || result.reason.unwrap().contains("Origin"));
+    let reason = result.reason.as_ref().unwrap();
+    assert!(reason.contains("origin") || reason.contains("Origin"));
 }
 
 // Helper functions
