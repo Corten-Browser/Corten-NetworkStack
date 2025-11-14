@@ -1,0 +1,57 @@
+contract_version: "1.0"
+component: http1_protocol
+type: feature_library
+depends_on:
+  - network_types
+  - network_errors
+  - dns_resolver
+  - tls_manager
+  - cookie_manager
+  - http_cache
+
+provides:
+  types:
+    Http1Client:
+      methods:
+        - name: new
+          params:
+            - config: Http1Config
+          returns: Self
+
+        - name: fetch
+          async: true
+          params:
+            - request: NetworkRequest
+          returns: Result<NetworkResponse, NetworkError>
+
+        - name: stream_response
+          async: true
+          params:
+            - request: NetworkRequest
+          returns: Result<ResponseStream, NetworkError>
+
+    Http1Config:
+      fields:
+        - pool_size: usize
+        - idle_timeout: Duration
+        - max_connections_per_host: usize
+        - enable_keepalive: bool
+        - enable_pipelining: bool
+
+    ConnectionPool:
+      methods:
+        - name: get_connection
+          async: true
+          params:
+            - host: "&str"
+            - port: u16
+          returns: Result<Http1Connection, NetworkError>
+
+        - name: return_connection
+          params:
+            - connection: Http1Connection
+
+exports:
+  - Http1Client
+  - Http1Config
+  - ConnectionPool

@@ -1,0 +1,55 @@
+contract_version: "1.0"
+component: http2_protocol
+type: feature_library
+depends_on:
+  - network_types
+  - network_errors
+  - dns_resolver
+  - tls_manager
+  - cookie_manager
+  - http_cache
+
+provides:
+  types:
+    Http2Client:
+      methods:
+        - name: new
+          params:
+            - config: Http2Config
+          returns: Self
+
+        - name: fetch
+          async: true
+          params:
+            - request: NetworkRequest
+          returns: Result<NetworkResponse, NetworkError>
+
+        - name: fetch_multiple
+          async: true
+          params:
+            - requests: Vec<NetworkRequest>
+          returns: Result<Vec<NetworkResponse>, NetworkError>
+
+    Http2Config:
+      fields:
+        - max_concurrent_streams: u32
+        - initial_window_size: u32
+        - max_frame_size: u32
+        - enable_push: bool
+
+    Http2Connection:
+      methods:
+        - name: send_request
+          async: true
+          params:
+            - request: NetworkRequest
+          returns: Result<NetworkResponse, NetworkError>
+
+        - name: ping
+          async: true
+          returns: Result<Duration, NetworkError>
+
+exports:
+  - Http2Client
+  - Http2Config
+  - Http2Connection

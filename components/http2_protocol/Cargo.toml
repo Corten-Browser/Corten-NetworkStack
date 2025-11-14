@@ -1,0 +1,50 @@
+[package]
+name = "http2-protocol"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+# Level 0 dependencies
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+
+# Level 1 dependencies
+dns-resolver = { path = "../dns_resolver" }
+tls-manager = { path = "../tls_manager" }
+cookie-manager = { path = "../cookie_manager" }
+http-cache = { path = "../http_cache" }
+
+# HTTP/2 implementation
+hyper = { version = "1.0", features = ["full"] }
+h2 = "0.4"
+http = "1.0"
+tower = { version = "0.4", features = ["full"] }
+
+# Async runtime
+tokio = { workspace = true }
+
+# Additional utilities
+bytes = "1.5"
+futures = "0.3"
+tracing = "0.1"
+url = "2.5"
+cookie = "0.18"
+
+[dev-dependencies]
+# Testing
+tokio-test = "0.4"
+mockito = "1.2"
+criterion = "0.5"
+
+# Test utilities
+tempfile = "3.8"
+wiremock = "0.6"
+
+[[test]]
+name = "unit"
+path = "tests/unit/mod.rs"
+
+[[test]]
+name = "integration"
+path = "tests/integration/mod.rs"

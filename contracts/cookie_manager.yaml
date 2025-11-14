@@ -1,0 +1,43 @@
+contract_version: "1.0"
+component: cookie_manager
+type: core_library
+depends_on:
+  - network_types
+  - network_errors
+
+provides:
+  types:
+    CookieStore:
+      methods:
+        - name: add_cookie
+          params:
+            - cookie: Cookie
+            - url: "&Url"
+          returns: Result<(), NetworkError>
+
+        - name: get_cookies
+          params:
+            - url: "&Url"
+          returns: Vec<Cookie>
+
+        - name: clear
+          returns: ()
+
+    CookieJar:
+      methods:
+        - name: new
+          returns: Self
+
+        - name: add
+          params:
+            - cookie: Cookie
+
+        - name: matches
+          params:
+            - url: "&Url"
+          returns: Vec<Cookie>
+
+exports:
+  - CookieStore
+  - CookieJar
+  - Cookie

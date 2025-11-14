@@ -1,0 +1,23 @@
+[package]
+name = "network-types"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+url = "2.5"
+http = "1.0"
+bytes = "1.5"
+futures = "0.3"
+
+[dev-dependencies]
+serde_json = "1.0"
+
+[[test]]
+name = "unit"
+path = "tests/unit/mod.rs"
+
+[[test]]
+name = "integration"
+path = "tests/integration/mod.rs"

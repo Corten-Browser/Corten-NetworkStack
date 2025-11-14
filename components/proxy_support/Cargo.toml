@@ -1,0 +1,38 @@
+[package]
+name = "proxy_support"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+# Workspace dependencies
+tokio.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+bytes.workspace = true
+futures.workspace = true
+url.workspace = true
+
+# Component dependencies
+network_types = { path = "../network_types" }
+network_errors = { path = "../network_errors" }
+tls_manager = { path = "../tls_manager" }
+dns_resolver = { path = "../dns_resolver" }
+
+# External dependencies
+tokio-util = { version = "0.7", features = ["codec"] }
+base64 = "0.21"
+
+[dev-dependencies]
+mockito = "1.2"
+wiremock = "0.5"
+tokio-test = "0.4"
+
+[[test]]
+name = "integration"
+path = "tests/integration/mod.rs"

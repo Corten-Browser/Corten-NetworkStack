@@ -1,0 +1,61 @@
+contract_version: "1.0"
+component: webrtc_channels
+type: feature_library
+depends_on:
+  - network_types
+  - network_errors
+  - webrtc_peer
+
+provides:
+  types:
+    RtcDataChannel:
+      methods:
+        - name: send
+          async: true
+          params:
+            - data: "&[u8]"
+          returns: Result<(), NetworkError>
+
+        - name: send_text
+          async: true
+          params:
+            - text: "&str"
+          returns: Result<(), NetworkError>
+
+        - name: recv
+          async: true
+          returns: Option<Result<DataChannelMessage, NetworkError>>
+
+        - name: close
+          async: true
+          returns: Result<(), NetworkError>
+
+        - name: state
+          returns: DataChannelState
+
+    DataChannelOptions:
+      fields:
+        - ordered: bool
+        - max_packet_life_time: Option<u16>
+        - max_retransmits: Option<u16>
+        - protocol: String
+        - negotiated: bool
+        - id: Option<u16>
+
+    DataChannelMessage:
+      enum:
+        - Text(String)
+        - Binary(Vec<u8>)
+
+    DataChannelState:
+      enum:
+        - Connecting
+        - Open
+        - Closing
+        - Closed
+
+exports:
+  - RtcDataChannel
+  - DataChannelOptions
+  - DataChannelMessage
+  - DataChannelState

@@ -1,0 +1,36 @@
+[package]
+name = "integration-tests"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+# All workspace components (use real implementations)
+network-types = { path = "../../components/network_types" }
+network-errors = { path = "../../components/network_errors" }
+dns-resolver = { path = "../../components/dns_resolver" }
+tls-manager = { path = "../../components/tls_manager" }
+cookie-manager = { path = "../../components/cookie_manager" }
+http-cache = { path = "../../components/http_cache" }
+http1-protocol = { path = "../../components/http1_protocol" }
+http2-protocol = { path = "../../components/http2_protocol" }
+http3-protocol = { path = "../../components/http3_protocol" }
+websocket-protocol = { path = "../../components/websocket_protocol" }
+webrtc-peer = { path = "../../components/webrtc_peer" }
+webrtc-channels = { path = "../../components/webrtc_channels" }
+network-stack = { path = "../../components/network_stack" }
+
+# Testing dependencies
+tokio = { version = "1.35", features = ["full", "test-util"] }
+tokio-test = "0.4"
+async-trait = "0.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+url = "2.5"
+http = "1.0"
+bytes = "1.5"
+futures = "0.3"
+
+# Test utilities
+tempfile = "3.8"
+wiremock = "0.6"

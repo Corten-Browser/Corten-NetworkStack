@@ -1,0 +1,19 @@
+[package]
+name = "network-errors"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+thiserror = "1.0"
+
+[dev-dependencies]
+# Test dependencies will be added during development
+
+[[test]]
+name = "unit"
+path = "tests/unit/mod.rs"
+
+[[test]]
+name = "integration"
+path = "tests/integration/mod.rs"

@@ -1,0 +1,91 @@
+contract_version: "1.0"
+component: network_types
+type: base_library
+provides:
+  types:
+    NetworkRequest:
+      fields:
+        - url: Url
+        - method: HttpMethod
+        - headers: HeaderMap
+        - body: Option<RequestBody>
+        - mode: RequestMode
+        - credentials: CredentialsMode
+        - cache: CacheMode
+        - redirect: RedirectMode
+        - referrer: Option<String>
+        - referrer_policy: ReferrerPolicy
+        - integrity: Option<String>
+        - keepalive: bool
+        - signal: Option<AbortSignal>
+        - priority: RequestPriority
+        - window: Option<WindowId>
+
+    NetworkResponse:
+      fields:
+        - url: Url
+        - status: u16
+        - status_text: String
+        - headers: HeaderMap
+        - body: ResponseBody
+        - redirected: bool
+        - type_: ResponseType
+        - timing: ResourceTiming
+
+    HttpMethod:
+      enum:
+        - Get
+        - Head
+        - Post
+        - Put
+        - Delete
+        - Connect
+        - Options
+        - Trace
+        - Patch
+
+    RequestBody:
+      enum:
+        - Bytes(Vec<u8>)
+        - Text(String)
+        - FormData(FormData)
+        - Stream(BodyStream)
+
+    ResponseBody:
+      enum:
+        - Bytes(Vec<u8>)
+        - Stream(BoxedStream)
+        - Empty
+
+    ResourceTiming:
+      fields:
+        - start_time: f64
+        - redirect_start: f64
+        - redirect_end: f64
+        - fetch_start: f64
+        - domain_lookup_start: f64
+        - domain_lookup_end: f64
+        - connect_start: f64
+        - connect_end: f64
+        - secure_connection_start: f64
+        - request_start: f64
+        - response_start: f64
+        - response_end: f64
+        - transfer_size: u64
+        - encoded_body_size: u64
+        - decoded_body_size: u64
+
+exports:
+  - NetworkRequest
+  - NetworkResponse
+  - HttpMethod
+  - RequestBody
+  - ResponseBody
+  - RequestMode
+  - CredentialsMode
+  - CacheMode
+  - RedirectMode
+  - ReferrerPolicy
+  - RequestPriority
+  - ResponseType
+  - ResourceTiming

@@ -1,0 +1,25 @@
+[package]
+name = "http-cache"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+lru = "0.12"
+tokio = { version = "1.35", features = ["sync", "time", "rt"] }
+serde = { version = "1.0", features = ["derive"] }
+http = "1.0"
+
+[dev-dependencies]
+tokio = { version = "1.35", features = ["macros", "rt-multi-thread"] }
+url = "2.5"
+
+[[test]]
+name = "unit"
+path = "tests/unit/mod.rs"
+
+[[test]]
+name = "integration"
+path = "tests/integration/mod.rs"

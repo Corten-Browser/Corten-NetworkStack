@@ -1,0 +1,32 @@
+[package]
+name = "webrtc-peer"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+webrtc = "0.9"
+interceptor = "0.10"
+tokio = { version = "1.35", features = ["full"] }
+uuid = { version = "1.6", features = ["v4", "serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+async-trait = "0.1"
+bytes = "1.5"
+
+# Path dependencies
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockall = "0.12"
+
+[[test]]
+name = "unit"
+path = "tests/unit/mod.rs"
+
+[[test]]
+name = "integration"
+path = "tests/integration/mod.rs"

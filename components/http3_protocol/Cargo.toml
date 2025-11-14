@@ -1,0 +1,33 @@
+[package]
+name = "http3-protocol"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+quinn = "0.10"
+h3 = "0.0.4"
+h3-quinn = "0.0.5"
+tokio = { version = "1.0", features = ["full"] }
+tokio-util = "0.7"
+bytes = "1.0"
+http = "1.0"
+url = "2.5"
+rustls = "0.21"
+rustls-native-certs = "0.6"
+thiserror = "1.0"
+tracing = "0.1"
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockito = "1.0"
+
+[[test]]
+name = "unit"
+path = "tests/unit/mod.rs"
+
+[[test]]
+name = "integration"
+path = "tests/integration/mod.rs"
