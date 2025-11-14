@@ -12,16 +12,19 @@ pub struct CtPolicy {
     pub min_sct_count: usize,
 }
 
-impl CtPolicy {
+impl Default for CtPolicy {
     /// Create a new CT policy with default settings
     ///
     /// Default policy requires at least one SCT.
-    pub fn default() -> Self {
+    fn default() -> Self {
         Self {
             require_sct: true,
             min_sct_count: 1,
         }
     }
+}
+
+impl CtPolicy {
 
     /// Create a lenient policy that doesn't require SCTs
     pub fn lenient() -> Self {
