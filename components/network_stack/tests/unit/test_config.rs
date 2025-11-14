@@ -39,6 +39,17 @@ fn test_network_config_customization() {
         security: None,
         proxy: None,
         dns: None,
+        cors: None,
+        request_scheduling: None,
+        bandwidth_limit: None,
+        url_handlers: None,
+        mixed_content: None,
+        csp: None,
+        certificate_transparency: None,
+        certificate_pinning: None,
+        ftp: None,
+        content_encoding: None,
+        platform_integration: None,
     };
 
     // Then: custom values should be preserved

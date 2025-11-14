@@ -229,8 +229,8 @@ impl NetworkStackImpl {
         let mut bandwidth_limiter = bandwidth_limiter::BandwidthLimiter::new();
         if let Some(limit) = config.bandwidth_limit {
             let condition = bandwidth_limiter::NetworkCondition::Custom {
-                download_kbps: limit / 1000, // Convert bytes/s to kbps
-                upload_kbps: limit / 1000,
+                download_kbps: (limit / 1000) as u32, // Convert bytes/s to kbps
+                upload_kbps: (limit / 1000) as u32,
                 latency_ms: 0,
             };
             bandwidth_limiter.apply_condition(condition);
@@ -426,10 +426,13 @@ impl NetworkStack for NetworkStackImpl {
 
                 return Ok(NetworkResponse {
                     status: 200,
+                    status_text: String::from("OK"),
                     headers,
-                    body: Some(data.data.into()),
+                    body: network_types::ResponseBody::Bytes(data.data),
                     url: request.url,
                     redirected: false,
+                    timing: network_types::ResourceTiming::default(),
+                    type_: network_types::ResponseType::Basic,
                 });
             }
             "file" => {
@@ -439,10 +442,13 @@ impl NetworkStack for NetworkStackImpl {
 
                 return Ok(NetworkResponse {
                     status: 200,
+                    status_text: String::from("OK"),
                     headers: http::HeaderMap::new(),
-                    body: Some(data.into()),
+                    body: network_types::ResponseBody::Bytes(data),
                     url: request.url,
                     redirected: false,
+                    timing: network_types::ResourceTiming::default(),
+                    type_: network_types::ResponseType::Basic,
                 });
             }
             "ftp" => {
