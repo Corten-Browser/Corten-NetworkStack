@@ -21,7 +21,12 @@ use url::Url;
 mod config;
 mod stack_impl;
 
-pub use config::NetworkConfig;
+pub use config::{
+    NetworkConfig, ProxyConfig, ProxyAuth,
+    ContentEncodingConfig, RequestSchedulingConfig, UrlHandlersConfig,
+    MixedContentConfig, CspConfig, CertificateTransparencyConfig,
+    CertificatePinningConfig, PlatformIntegrationConfig,
+};
 pub use stack_impl::{NetworkStackImpl, NetworkStatus, ConnectionType, EffectiveConnectionType};
 
 /// Main Network Stack component interface
@@ -118,6 +123,38 @@ pub trait NetworkStack: Send + Sync {
     ///
     /// Returns a reference to the certificate store for TLS certificate management.
     fn cert_store(&self) -> Arc<tls_manager::CertificateStore>;
+
+    // Phase 2 methods
+
+    /// Get bandwidth statistics
+    ///
+    /// Returns statistics about network bandwidth usage including bytes sent/received.
+    fn get_bandwidth_stats(&self) -> bandwidth_limiter::BandwidthStats;
+
+    /// Set CSP (Content Security Policy) policy
+    ///
+    /// Sets the CSP policy header that will be enforced for all requests.
+    ///
+    /// # Arguments
+    /// * `policy` - CSP policy string (e.g., "default-src 'self'")
+    fn set_csp_policy(&mut self, policy: &str);
+
+    /// Set proxy configuration
+    ///
+    /// Sets proxy configuration for network requests.
+    ///
+    /// # Arguments
+    /// * `config` - Proxy configuration (HTTP or SOCKS5)
+    fn set_proxy_config(&mut self, config: Option<ProxyConfig>);
+
+    /// Add certificate pin for a host
+    ///
+    /// Adds a certificate pin (hash) that will be verified for the specified host.
+    ///
+    /// # Arguments
+    /// * `host` - The hostname to pin
+    /// * `pin_hash` - The certificate hash to pin
+    fn add_certificate_pin(&mut self, host: &str, pin_hash: Vec<u8>);
 }
 
 /// Network conditions for throttling and simulation

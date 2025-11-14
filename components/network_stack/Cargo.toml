@@ -19,6 +19,20 @@ websocket-protocol = { path = "../websocket_protocol" }
 webrtc-peer = { path = "../webrtc_peer" }
 webrtc-channels = { path = "../webrtc_channels" }
 
+# Phase 2 component dependencies
+cors-validator = { path = "../cors_validator" }
+content_encoding = { path = "../content_encoding" }
+request-scheduler = { path = "../request_scheduler" }
+bandwidth_limiter = { path = "../bandwidth_limiter" }
+url_handlers = { path = "../url_handlers" }
+mixed_content_blocker = { path = "../mixed_content_blocker" }
+csp_processor = { path = "../csp_processor" }
+proxy_support = { path = "../proxy_support" }
+certificate_transparency = { path = "../certificate_transparency" }
+certificate_pinning = { path = "../certificate_pinning" }
+platform_integration = { path = "../platform_integration" }
+ftp_protocol = { path = "../ftp_protocol" }
+
 # Async runtime
 tokio = { workspace = true }
 async-trait = { workspace = true }
@@ -35,6 +49,7 @@ tracing = { workspace = true }
 # Test dependencies
 tokio-test = "0.4"
 mockito = "1.2"
+http = "1.0"
 
 [[test]]
 name = "unit"
