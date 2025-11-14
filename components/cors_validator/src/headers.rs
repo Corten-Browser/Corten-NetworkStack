@@ -19,12 +19,22 @@ impl HeaderBuilder {
 
     /// Build CORS headers for a request
     ///
-    /// Adds headers that the client should send with the request.
-    pub fn build_request_headers(&self, _request: &NetworkRequest, _origin: &str) -> HeaderMap {
+    /// Adds headers that should be included in the response to this request.
+    /// When validating a request server-side, these headers indicate what
+    /// the response should include.
+    pub fn build_request_headers(&self, request: &NetworkRequest, _origin: &str) -> HeaderMap {
         let mut headers = HeaderMap::new();
 
-        // Request headers are typically set by the browser/client
-        // This method exists for completeness and future extensibility
+        // Add Access-Control-Allow-Credentials if:
+        // 1. Configuration allows credentials
+        // 2. Request includes credentials
+        use network_types::CredentialsMode;
+        if self.config.allow_credentials && request.credentials == CredentialsMode::Include {
+            headers.insert(
+                "Access-Control-Allow-Credentials",
+                HeaderValue::from_static("true"),
+            );
+        }
 
         headers
     }

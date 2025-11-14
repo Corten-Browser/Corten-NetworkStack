@@ -45,11 +45,13 @@ futures = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 
+# HTTP types (used in data URL and file URL handlers)
+http = "1.0"
+
 [dev-dependencies]
 # Test dependencies
 tokio-test = "0.4"
 mockito = "1.2"
-http = "1.0"
 
 [[test]]
 name = "unit"
