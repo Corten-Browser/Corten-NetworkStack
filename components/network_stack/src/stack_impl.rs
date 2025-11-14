@@ -9,14 +9,55 @@
 use crate::{NetworkConditions, NetworkConfig, NetworkStack};
 use async_trait::async_trait;
 use bytes::Bytes;
-use futures::stream::{self, Stream};
+use futures::stream::Stream;
 use network_errors::NetworkError;
-use network_types::{ConnectionType, EffectiveConnectionType, NetworkRequest, NetworkResponse, NetworkStatus};
+use network_types::{NetworkRequest, NetworkResponse};
 use std::pin::Pin;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{debug, info};
 use url::Url;
+
+/// Network connection type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConnectionType {
+    /// Connection type unknown
+    Unknown,
+    /// Ethernet connection
+    Ethernet,
+    /// WiFi connection
+    WiFi,
+    /// Cellular connection
+    Cellular,
+}
+
+/// Effective connection type (based on observed latency and bandwidth)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EffectiveConnectionType {
+    /// Slow 2G
+    Slow2G,
+    /// 2G
+    Type2G,
+    /// 3G
+    Type3G,
+    /// 4G
+    Type4G,
+}
+
+/// Network status information
+#[derive(Debug, Clone)]
+pub struct NetworkStatus {
+    /// Whether the network is online
+    pub online: bool,
+    /// Physical connection type
+    pub connection_type: ConnectionType,
+    /// Effective connection type (based on performance)
+    pub effective_type: EffectiveConnectionType,
+    /// Downlink speed in megabits per second
+    pub downlink_mbps: f64,
+    /// Round-trip time in milliseconds
+    pub rtt_ms: u32,
+}
 
 /// Network stack implementation
 ///
@@ -37,20 +78,20 @@ pub struct NetworkStackImpl {
     /// WebSocket client
     websocket_client: Arc<websocket_protocol::WebSocketClient>,
 
-    /// WebRTC manager
-    webrtc_manager: Arc<webrtc_peer::WebRtcManager>,
-
     /// DNS resolver
-    dns_resolver: Arc<dns_resolver::DnsResolver>,
+    dns_resolver: Arc<dyn dns_resolver::DnsResolver>,
 
-    /// TLS manager
-    tls_manager: Arc<tls_manager::TlsManager>,
+    /// TLS configuration
+    tls_config: tls_manager::TlsConfig,
 
     /// Cookie store
     cookie_store: Arc<cookie_manager::CookieStore>,
 
     /// HTTP cache
     http_cache: Arc<http_cache::HttpCache>,
+
+    /// Certificate store
+    cert_store: Arc<tls_manager::CertificateStore>,
 
     /// Network conditions (for throttling/simulation)
     conditions: Arc<RwLock<NetworkConditions>>,
@@ -73,73 +114,49 @@ impl NetworkStackImpl {
 
         // Initialize DNS resolver
         let dns_config = config.dns.clone().unwrap_or_default();
-        let dns_resolver = Arc::new(dns_resolver::DnsResolver::new(dns_config)?);
+        let dns_resolver = Arc::new(dns_resolver::StandardResolver::new(Some(dns_config))?) as Arc<dyn dns_resolver::DnsResolver>;
 
-        // Initialize TLS manager
-        let tls_config = config.security.clone().map(|s| tls_manager::TlsConfig {
-            verify_certificates: s.verify_certificates,
-            enable_sni: true,
-            enable_alpn: true,
-        }).unwrap_or_default();
-        let tls_manager = Arc::new(tls_manager::TlsManager::new(tls_config)?);
+        // Initialize TLS configuration
+        let tls_config = config.security.clone().map(|_s| tls_manager::TlsConfig::new()
+            .with_alpn_protocols(vec![b"h2".to_vec(), b"http/1.1".to_vec()])
+        ).unwrap_or_default();
+
+        // Initialize certificate store
+        let cert_store = Arc::new(tls_manager::CertificateStore::new());
 
         // Initialize cookie store
         let cookie_store = Arc::new(cookie_manager::CookieStore::new());
 
         // Initialize HTTP cache
-        let cache_config = config.cache.clone().unwrap_or_default();
-        let http_cache = Arc::new(http_cache::HttpCache::new(
-            cache_config.max_size,
-            cache_config.enabled,
-        )?);
+        let cache_config = config.cache.clone()
+            .map(|c| http_cache::CacheConfig {
+                enabled: true,
+                max_size_bytes: c.max_size,
+                max_age_seconds: 3600, // Default 1 hour
+            })
+            .unwrap_or_default();
+        let http_cache = Arc::new(http_cache::HttpCache::new(cache_config));
 
         // Initialize HTTP/1.1 client
         let http1_config = config.http1.clone().unwrap_or_default();
-        let http1_client = Arc::new(http1_protocol::Http1Client::new(
-            http1_config,
-            dns_resolver.clone(),
-            tls_manager.clone(),
-            cookie_store.clone(),
-            http_cache.clone(),
-        )?);
+        let http1_client = Arc::new(http1_protocol::Http1Client::new(http1_config));
 
         // Initialize HTTP/2 client
         let http2_config = config.http2.clone().unwrap_or_default();
-        let http2_client = Arc::new(http2_protocol::Http2Client::new(
-            http2_config,
-            dns_resolver.clone(),
-            tls_manager.clone(),
-            cookie_store.clone(),
-            http_cache.clone(),
-        )?);
+        let http2_client = Arc::new(
+            http2_protocol::Http2Client::new(http2_config)
+                .map_err(|e| NetworkError::ProtocolError(format!("HTTP/2 initialization failed: {:?}", e)))?
+        );
 
         // Initialize HTTP/3 client (if enabled)
         let http3_client = if let Some(http3_config) = config.http3.clone() {
-            Some(Arc::new(http3_protocol::Http3Client::new(
-                http3_config,
-                dns_resolver.clone(),
-                tls_manager.clone(),
-                cookie_store.clone(),
-                http_cache.clone(),
-            )?))
+            Some(Arc::new(http3_protocol::Http3Client::new(http3_config)))
         } else {
             None
         };
 
         // Initialize WebSocket client
-        let ws_config = config.websocket.clone().unwrap_or_default();
-        let websocket_client = Arc::new(websocket_protocol::WebSocketClient::new(
-            ws_config.max_message_size,
-            ws_config.enable_compression,
-            tls_manager.clone(),
-        )?);
-
-        // Initialize WebRTC manager
-        let webrtc_config = config.webrtc.clone().unwrap_or_default();
-        let webrtc_manager = Arc::new(webrtc_peer::WebRtcManager::new(
-            webrtc_config.max_peer_connections,
-            webrtc_config.enable_ice,
-        )?);
+        let websocket_client = Arc::new(websocket_protocol::WebSocketClient::new());
 
         // Initialize network status
         let status = Arc::new(RwLock::new(NetworkStatus {
@@ -161,11 +178,11 @@ impl NetworkStackImpl {
             http2_client,
             http3_client,
             websocket_client,
-            webrtc_manager,
             dns_resolver,
-            tls_manager,
+            tls_config,
             cookie_store,
             http_cache,
+            cert_store,
             conditions,
             status,
         })
@@ -232,7 +249,7 @@ impl NetworkStack for NetworkStackImpl {
         // Check if offline mode is enabled
         let conditions = self.conditions.read().await;
         if conditions.offline {
-            return Err(NetworkError::Offline);
+            return Err(NetworkError::ConnectionFailed("Network is offline".to_string()));
         }
         drop(conditions);
 
@@ -252,26 +269,11 @@ impl NetworkStack for NetworkStackImpl {
 
     async fn stream_response(
         &self,
-        request: NetworkRequest,
+        _request: NetworkRequest,
     ) -> Result<Pin<Box<dyn Stream<Item = Result<Bytes, NetworkError>> + Send>>, NetworkError> {
-        debug!("Streaming URL: {}", request.url);
-
-        // Check if offline mode is enabled
-        let conditions = self.conditions.read().await;
-        if conditions.offline {
-            return Err(NetworkError::Offline);
-        }
-        drop(conditions);
-
-        // Select appropriate protocol handler
-        let client = self.select_http_client(&request.url);
-
-        // Route to appropriate protocol handler
-        match client {
-            HttpProtocolClient::Http1(client) => client.stream_response(request).await,
-            HttpProtocolClient::Http2(client) => client.stream_response(request).await,
-            HttpProtocolClient::Http3(client) => client.stream_response(request).await,
-        }
+        // TODO: Implement streaming response support
+        // Current protocol clients don't expose streaming APIs yet
+        Err(NetworkError::ProtocolError("Streaming responses not yet implemented".to_string()))
     }
 
     async fn connect_websocket(
@@ -284,7 +286,7 @@ impl NetworkStack for NetworkStackImpl {
         // Check if offline mode is enabled
         let conditions = self.conditions.read().await;
         if conditions.offline {
-            return Err(NetworkError::Offline);
+            return Err(NetworkError::ConnectionFailed("Network is offline".to_string()));
         }
         drop(conditions);
 
@@ -301,12 +303,12 @@ impl NetworkStack for NetworkStackImpl {
         // Check if offline mode is enabled
         let conditions = self.conditions.read().await;
         if conditions.offline {
-            return Err(NetworkError::Offline);
+            return Err(NetworkError::ConnectionFailed("Network is offline".to_string()));
         }
         drop(conditions);
 
-        // Delegate to WebRTC manager
-        self.webrtc_manager.create_peer_connection(config).await
+        // Create peer connection directly
+        webrtc_peer::RtcPeerConnection::new(config).await
     }
 
     fn get_network_status(&self) -> NetworkStatus {
@@ -341,6 +343,6 @@ impl NetworkStack for NetworkStackImpl {
     }
 
     fn cert_store(&self) -> Arc<tls_manager::CertificateStore> {
-        self.tls_manager.cert_store()
+        self.cert_store.clone()
     }
 }

@@ -3,8 +3,13 @@
 //! These tests verify the component works with real dependencies
 
 use http2_protocol::{Http2Client, Http2Config};
-use network_types::NetworkRequest;
+use http::HeaderMap;
+use network_types::{
+    CacheMode, CredentialsMode, HttpMethod, NetworkRequest, RedirectMode, ReferrerPolicy,
+    RequestMode, RequestPriority,
+};
 use std::time::Duration;
+use url::Url;
 
 #[tokio::test]
 async fn test_http2_client_basic_request() {
@@ -77,9 +82,57 @@ async fn test_http2_client_multiplexing() {
 
     // Create multiple requests
     let requests = vec![
-        NetworkRequest::get("https://example.com/1"),
-        NetworkRequest::get("https://example.com/2"),
-        NetworkRequest::get("https://example.com/3"),
+        NetworkRequest {
+            url: Url::parse("https://example.com/1").unwrap(),
+            method: HttpMethod::Get,
+            headers: HeaderMap::new(),
+            body: None,
+            mode: RequestMode::Cors,
+            credentials: CredentialsMode::SameOrigin,
+            cache: CacheMode::Default,
+            redirect: RedirectMode::Follow,
+            referrer: None,
+            referrer_policy: ReferrerPolicy::NoReferrer,
+            integrity: None,
+            keepalive: false,
+            signal: None,
+            priority: RequestPriority::Auto,
+            window: None,
+        },
+        NetworkRequest {
+            url: Url::parse("https://example.com/2").unwrap(),
+            method: HttpMethod::Get,
+            headers: HeaderMap::new(),
+            body: None,
+            mode: RequestMode::Cors,
+            credentials: CredentialsMode::SameOrigin,
+            cache: CacheMode::Default,
+            redirect: RedirectMode::Follow,
+            referrer: None,
+            referrer_policy: ReferrerPolicy::NoReferrer,
+            integrity: None,
+            keepalive: false,
+            signal: None,
+            priority: RequestPriority::Auto,
+            window: None,
+        },
+        NetworkRequest {
+            url: Url::parse("https://example.com/3").unwrap(),
+            method: HttpMethod::Get,
+            headers: HeaderMap::new(),
+            body: None,
+            mode: RequestMode::Cors,
+            credentials: CredentialsMode::SameOrigin,
+            cache: CacheMode::Default,
+            redirect: RedirectMode::Follow,
+            referrer: None,
+            referrer_policy: ReferrerPolicy::NoReferrer,
+            integrity: None,
+            keepalive: false,
+            signal: None,
+            priority: RequestPriority::Auto,
+            window: None,
+        },
     ];
 
     // This would require a test server to actually work

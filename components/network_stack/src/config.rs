@@ -34,7 +34,7 @@ pub struct NetworkConfig {
     pub proxy: Option<ProxyConfig>,
 
     /// DNS configuration
-    pub dns: Option<dns_resolver::DnsConfig>,
+    pub dns: Option<dns_resolver::DohConfig>,
 }
 
 impl Default for NetworkConfig {
@@ -48,7 +48,7 @@ impl Default for NetworkConfig {
             cache: Some(CacheConfig::default()),
             security: Some(SecurityConfig::default()),
             proxy: None,
-            dns: Some(dns_resolver::DnsConfig::default()),
+            dns: Some(dns_resolver::DohConfig::default()),
         }
     }
 }

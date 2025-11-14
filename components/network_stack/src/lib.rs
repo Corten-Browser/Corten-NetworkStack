@@ -13,17 +13,16 @@ use async_trait::async_trait;
 use bytes::Bytes;
 use futures::stream::Stream;
 use network_errors::NetworkError;
-use network_types::{NetworkRequest, NetworkResponse, NetworkStatus};
+use network_types::{NetworkRequest, NetworkResponse};
 use std::pin::Pin;
 use std::sync::Arc;
-use tokio::sync::RwLock;
 use url::Url;
 
 mod config;
 mod stack_impl;
 
 pub use config::NetworkConfig;
-pub use stack_impl::NetworkStackImpl;
+pub use stack_impl::{NetworkStackImpl, NetworkStatus, ConnectionType, EffectiveConnectionType};
 
 /// Main Network Stack component interface
 ///
