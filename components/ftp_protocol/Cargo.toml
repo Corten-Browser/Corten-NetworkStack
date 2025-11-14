@@ -4,6 +4,22 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+tokio = { workspace = true, features = ["net", "io-util", "time"] }
+thiserror = { workspace = true }
+bytes = { workspace = true }
+
+[dev-dependencies]
+tokio-test = "0.4"
 
 [lib]
 path = "src/lib.rs"
+
+[[test]]
+name = "unit"
+path = "tests/unit/mod.rs"
+
+[[test]]
+name = "integration"
+path = "tests/integration/mod.rs"
