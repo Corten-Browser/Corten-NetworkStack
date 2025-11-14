@@ -1,0 +1,45 @@
+[package]
+name = "network-stack"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+# Local component dependencies
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+dns-resolver = { path = "../dns_resolver" }
+tls-manager = { path = "../tls_manager" }
+cookie-manager = { path = "../cookie_manager" }
+http-cache = { path = "../http_cache" }
+http1-protocol = { path = "../http1_protocol" }
+http2-protocol = { path = "../http2_protocol" }
+http3-protocol = { path = "../http3_protocol" }
+websocket-protocol = { path = "../websocket_protocol" }
+webrtc-peer = { path = "../webrtc_peer" }
+webrtc-channels = { path = "../webrtc_channels" }
+
+# Async runtime
+tokio = { workspace = true }
+async-trait = { workspace = true }
+
+# Serialization and types
+serde = { workspace = true }
+url = { workspace = true }
+bytes = { workspace = true }
+futures = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+# Test dependencies
+tokio-test = "0.4"
+mockito = "1.2"
+
+[[test]]
+name = "unit"
+path = "tests/unit/mod.rs"
+
+[[test]]
+name = "integration"
+path = "tests/integration/mod.rs"

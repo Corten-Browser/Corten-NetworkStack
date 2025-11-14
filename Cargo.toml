@@ -1,0 +1,46 @@
+[workspace]
+members = [
+    "components/network_types",
+    "components/network_errors",
+    "components/dns_resolver",
+    "components/tls_manager",
+    "components/cookie_manager",
+    "components/http_cache",
+    "components/http1_protocol",
+    "components/http2_protocol",
+    "components/http3_protocol",
+    "components/websocket_protocol",
+    "components/webrtc_peer",
+    "components/webrtc_channels",
+    "components/network_stack",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+authors = ["CortenBrowser Contributors"]
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+# Shared dependencies across all components
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+anyhow = "1.0"
+tracing = "0.1"
+bytes = "1.5"
+futures = "0.3"
+url = "2.5"
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[profile.dev]
+opt-level = 0
+debug = true

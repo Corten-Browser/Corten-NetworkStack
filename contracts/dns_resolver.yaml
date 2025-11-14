@@ -1,0 +1,48 @@
+contract_version: "1.0"
+component: dns_resolver
+type: core_library
+depends_on:
+  - network_types
+  - network_errors
+
+provides:
+  traits:
+    DnsResolver:
+      methods:
+        - name: resolve
+          async: true
+          params:
+            - hostname: String
+          returns: Result<Vec<IpAddr>, NetworkError>
+
+        - name: resolve_with_timeout
+          async: true
+          params:
+            - hostname: String
+            - timeout: Duration
+          returns: Result<Vec<IpAddr>, NetworkError>
+
+  types:
+    DnsCache:
+      methods:
+        - name: get
+          params:
+            - hostname: "&str"
+          returns: Option<Vec<IpAddr>>
+
+        - name: insert
+          params:
+            - hostname: String
+            - addresses: Vec<IpAddr>
+            - ttl: Duration
+
+    DohConfig:
+      fields:
+        - enabled: bool
+        - resolver_url: String
+        - use_fallback: bool
+
+exports:
+  - DnsResolver
+  - DnsCache
+  - DohConfig

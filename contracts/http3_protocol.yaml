@@ -1,0 +1,49 @@
+contract_version: "1.0"
+component: http3_protocol
+type: feature_library
+depends_on:
+  - network_types
+  - network_errors
+  - dns_resolver
+  - tls_manager
+
+provides:
+  types:
+    Http3Client:
+      methods:
+        - name: new
+          params:
+            - config: Http3Config
+          returns: Self
+
+        - name: fetch
+          async: true
+          params:
+            - request: NetworkRequest
+          returns: Result<NetworkResponse, NetworkError>
+
+        - name: enable_0rtt
+          params:
+            - enabled: bool
+
+    Http3Config:
+      fields:
+        - max_idle_timeout: Duration
+        - max_udp_payload_size: u32
+        - enable_0rtt: bool
+        - enable_connection_migration: bool
+
+    QuicConnection:
+      methods:
+        - name: open_stream
+          async: true
+          returns: Result<QuicStream, NetworkError>
+
+        - name: close
+          async: true
+          returns: Result<(), NetworkError>
+
+exports:
+  - Http3Client
+  - Http3Config
+  - QuicConnection

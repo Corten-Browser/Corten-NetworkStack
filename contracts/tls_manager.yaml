@@ -1,0 +1,55 @@
+contract_version: "1.0"
+component: tls_manager
+type: core_library
+depends_on:
+  - network_types
+  - network_errors
+
+provides:
+  types:
+    TlsConfig:
+      methods:
+        - name: new
+          returns: Self
+
+        - name: with_alpn_protocols
+          params:
+            - protocols: Vec<Vec<u8>>
+          returns: Self
+
+        - name: with_root_certificates
+          params:
+            - certs: RootCertStore
+          returns: Self
+
+    CertificateStore:
+      methods:
+        - name: add_certificate
+          params:
+            - cert: Certificate
+          returns: Result<(), NetworkError>
+
+        - name: verify_certificate
+          async: true
+          params:
+            - cert: "&Certificate"
+            - hostname: "&str"
+          returns: Result<(), NetworkError>
+
+    HstsStore:
+      methods:
+        - name: is_hsts_enabled
+          params:
+            - domain: "&str"
+          returns: bool
+
+        - name: add_hsts_entry
+          params:
+            - domain: String
+            - max_age: Duration
+            - include_subdomains: bool
+
+exports:
+  - TlsConfig
+  - CertificateStore
+  - HstsStore

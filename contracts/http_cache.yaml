@@ -1,0 +1,49 @@
+contract_version: "1.0"
+component: http_cache
+type: core_library
+depends_on:
+  - network_types
+  - network_errors
+
+provides:
+  types:
+    HttpCache:
+      methods:
+        - name: new
+          params:
+            - config: CacheConfig
+          returns: Self
+
+        - name: get
+          async: true
+          params:
+            - request: "&NetworkRequest"
+          returns: Option<CachedResponse>
+
+        - name: store
+          async: true
+          params:
+            - request: "&NetworkRequest"
+            - response: "&NetworkResponse"
+          returns: Result<(), NetworkError>
+
+        - name: clear
+          async: true
+          returns: Result<(), NetworkError>
+
+    CacheConfig:
+      fields:
+        - max_size_bytes: u64
+        - max_age_seconds: u64
+        - enabled: bool
+
+    CachedResponse:
+      fields:
+        - response: NetworkResponse
+        - cached_at: SystemTime
+        - expires_at: SystemTime
+
+exports:
+  - HttpCache
+  - CacheConfig
+  - CachedResponse

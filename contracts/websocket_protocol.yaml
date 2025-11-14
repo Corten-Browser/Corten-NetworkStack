@@ -1,0 +1,61 @@
+contract_version: "1.0"
+component: websocket_protocol
+type: feature_library
+depends_on:
+  - network_types
+  - network_errors
+  - tls_manager
+
+provides:
+  types:
+    WebSocketConnection:
+      methods:
+        - name: send
+          async: true
+          params:
+            - message: WebSocketMessage
+          returns: Result<(), NetworkError>
+
+        - name: recv
+          async: true
+          returns: Option<Result<WebSocketMessage, NetworkError>>
+
+        - name: close
+          async: true
+          params:
+            - code: u16
+            - reason: String
+          returns: Result<(), NetworkError>
+
+        - name: state
+          returns: WebSocketState
+
+    WebSocketMessage:
+      enum:
+        - Text(String)
+        - Binary(Vec<u8>)
+        - Ping(Vec<u8>)
+        - Pong(Vec<u8>)
+        - Close(Option<CloseFrame>)
+
+    WebSocketState:
+      enum:
+        - Connecting
+        - Open
+        - Closing
+        - Closed
+
+    WebSocketClient:
+      methods:
+        - name: connect
+          async: true
+          params:
+            - url: Url
+            - protocols: Vec<String>
+          returns: Result<WebSocketConnection, NetworkError>
+
+exports:
+  - WebSocketConnection
+  - WebSocketMessage
+  - WebSocketState
+  - WebSocketClient

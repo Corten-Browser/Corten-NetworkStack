@@ -1,0 +1,70 @@
+contract_version: "1.0"
+component: webrtc_peer
+type: feature_library
+depends_on:
+  - network_types
+  - network_errors
+  - tls_manager
+
+provides:
+  types:
+    RtcPeerConnection:
+      methods:
+        - name: new
+          params:
+            - config: RtcConfiguration
+          returns: Result<Self, NetworkError>
+
+        - name: create_offer
+          async: true
+          params:
+            - options: OfferOptions
+          returns: Result<SessionDescription, NetworkError>
+
+        - name: create_answer
+          async: true
+          params:
+            - options: AnswerOptions
+          returns: Result<SessionDescription, NetworkError>
+
+        - name: set_local_description
+          async: true
+          params:
+            - description: SessionDescription
+          returns: Result<(), NetworkError>
+
+        - name: set_remote_description
+          async: true
+          params:
+            - description: SessionDescription
+          returns: Result<(), NetworkError>
+
+        - name: add_ice_candidate
+          async: true
+          params:
+            - candidate: IceCandidate
+          returns: Result<(), NetworkError>
+
+    RtcConfiguration:
+      fields:
+        - ice_servers: Vec<IceServer>
+        - ice_transport_policy: IceTransportPolicy
+        - bundle_policy: BundlePolicy
+
+    SessionDescription:
+      fields:
+        - sdp_type: SdpType
+        - sdp: String
+
+    IceCandidate:
+      fields:
+        - candidate: String
+        - sdp_mid: Option<String>
+        - sdp_m_line_index: Option<u16>
+
+exports:
+  - RtcPeerConnection
+  - RtcConfiguration
+  - SessionDescription
+  - IceCandidate
+  - IceServer

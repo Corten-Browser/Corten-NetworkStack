@@ -1,0 +1,95 @@
+contract_version: "1.0"
+component: network_stack
+type: integration_library
+depends_on:
+  - network_types
+  - network_errors
+  - dns_resolver
+  - tls_manager
+  - cookie_manager
+  - http_cache
+  - http1_protocol
+  - http2_protocol
+  - http3_protocol
+  - websocket_protocol
+  - webrtc_peer
+  - webrtc_channels
+
+provides:
+  traits:
+    NetworkStack:
+      methods:
+        - name: fetch
+          async: true
+          params:
+            - request: NetworkRequest
+          returns: Result<NetworkResponse, NetworkError>
+
+        - name: stream_response
+          async: true
+          params:
+            - request: NetworkRequest
+          returns: Result<ResponseStream, NetworkError>
+
+        - name: connect_websocket
+          async: true
+          params:
+            - url: Url
+            - protocols: Vec<String>
+          returns: Result<WebSocketConnection, NetworkError>
+
+        - name: create_rtc_peer_connection
+          async: true
+          params:
+            - config: RtcConfiguration
+          returns: Result<RtcPeerConnection, NetworkError>
+
+        - name: get_network_status
+          returns: NetworkStatus
+
+        - name: set_network_conditions
+          params:
+            - conditions: NetworkConditions
+
+        - name: clear_cache
+          async: true
+          returns: Result<(), NetworkError>
+
+        - name: cookie_store
+          returns: Arc<CookieStore>
+
+        - name: cert_store
+          returns: Arc<CertificateStore>
+
+  types:
+    NetworkStackImpl:
+      implements: NetworkStack
+      methods:
+        - name: new
+          params:
+            - config: NetworkConfig
+          returns: Self
+
+    NetworkConfig:
+      fields:
+        - http: HttpConfig
+        - websocket: WebSocketConfig
+        - webrtc: WebRtcConfig
+        - cache: CacheConfig
+        - security: SecurityConfig
+        - proxy: ProxyConfig
+        - dns: DnsConfig
+
+    NetworkStatus:
+      fields:
+        - online: bool
+        - connection_type: ConnectionType
+        - effective_type: EffectiveConnectionType
+        - downlink_mbps: f64
+        - rtt_ms: u32
+
+exports:
+  - NetworkStack
+  - NetworkStackImpl
+  - NetworkConfig
+  - NetworkStatus

@@ -1,0 +1,36 @@
+[package]
+name = "http1-protocol"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+dns-resolver = { path = "../dns_resolver" }
+tls-manager = { path = "../tls_manager" }
+cookie-manager = { path = "../cookie_manager" }
+http-cache = { path = "../http_cache" }
+hyper = { version = "1.0", features = ["full"] }
+hyper-util = { version = "0.1", features = ["full"] }
+http = "1.0"
+http-body-util = "0.1"
+tokio = { workspace = true }
+tower = { version = "0.4", features = ["full"] }
+tower-service = "0.3"
+pin-project-lite = "0.2"
+url = "2.5"
+bytes = "1.5"
+futures = "0.3"
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }
+wiremock = "0.6"
+
+[[test]]
+name = "unit"
+path = "tests/unit/mod.rs"
+
+[[test]]
+name = "integration"
+path = "tests/integration/mod.rs"
