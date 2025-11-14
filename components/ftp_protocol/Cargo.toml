@@ -1,0 +1,9 @@
+[package]
+name = "ftp_protocol"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+
+[lib]
+path = "src/lib.rs"

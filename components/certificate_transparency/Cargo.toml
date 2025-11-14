@@ -1,0 +1,9 @@
+[package]
+name = "certificate_transparency"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+
+[lib]
+path = "src/lib.rs"
