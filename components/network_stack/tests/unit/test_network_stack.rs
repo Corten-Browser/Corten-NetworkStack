@@ -2,9 +2,10 @@
 //!
 //! Follows TDD approach - these tests are written BEFORE implementation.
 
-use network_stack::{NetworkConfig, NetworkStack, NetworkStackImpl};
+use network_stack::{NetworkConditions, NetworkConfig, NetworkStack, NetworkStackImpl};
 use network_types::{HttpMethod, NetworkRequest};
 use url::Url;
+use webrtc_peer::{BundlePolicy, IceTransportPolicy, RtcConfiguration};
 
 /// Test that NetworkStackImpl can be instantiated with default config
 #[tokio::test]
@@ -36,10 +37,12 @@ async fn test_fetch_http_request() {
         cache: network_types::CacheMode::Default,
         redirect: network_types::RedirectMode::Follow,
         referrer: None,
-        referrer_policy: None,
+        referrer_policy: network_types::ReferrerPolicy::NoReferrer,
         integrity: None,
         keepalive: false,
-        priority: network_types::Priority::Auto,
+        signal: None,
+        priority: network_types::RequestPriority::Auto,
+        window: None,
     };
 
     // When: making a fetch request
@@ -67,10 +70,12 @@ async fn test_fetch_routes_to_http1_for_https() {
         cache: network_types::CacheMode::Default,
         redirect: network_types::RedirectMode::Follow,
         referrer: None,
-        referrer_policy: None,
+        referrer_policy: network_types::ReferrerPolicy::NoReferrer,
         integrity: None,
         keepalive: false,
-        priority: network_types::Priority::Auto,
+        signal: None,
+        priority: network_types::RequestPriority::Auto,
+        window: None,
     };
 
     // When: making a fetch request to HTTPS URL
@@ -102,7 +107,7 @@ fn test_set_network_conditions() {
     let mut stack = NetworkStackImpl::new(config).unwrap();
 
     // When: setting network conditions
-    let conditions = network_types::NetworkConditions {
+    let conditions = NetworkConditions {
         offline: false,
         download_throughput: 1024 * 1024, // 1 Mbps
         upload_throughput: 512 * 1024,    // 512 Kbps
@@ -123,10 +128,10 @@ fn test_cookie_store_accessor() {
     let stack = NetworkStackImpl::new(config).unwrap();
 
     // When: accessing cookie store
-    let cookie_store = stack.cookie_store();
+    let _cookie_store = stack.cookie_store();
 
     // Then: it should return a valid Arc<CookieStore>
-    assert!(cookie_store.is_some() || cookie_store.is_none(), "Should return cookie store handle");
+    // If the method returns, we have a valid Arc
 }
 
 /// Test certificate store accessor
@@ -137,10 +142,10 @@ fn test_cert_store_accessor() {
     let stack = NetworkStackImpl::new(config).unwrap();
 
     // When: accessing certificate store
-    let cert_store = stack.cert_store();
+    let _cert_store = stack.cert_store();
 
     // Then: it should return a valid Arc<CertificateStore>
-    assert!(cert_store.is_some() || cert_store.is_none(), "Should return certificate store handle");
+    // If the method returns, we have a valid Arc
 }
 
 /// Test clear cache functionality
@@ -181,10 +186,10 @@ async fn test_create_rtc_peer_connection() {
     let config = NetworkConfig::default();
     let stack = NetworkStackImpl::new(config).unwrap();
 
-    let rtc_config = network_types::RtcConfiguration {
+    let rtc_config = RtcConfiguration {
         ice_servers: vec![],
-        ice_transport_policy: network_types::IceTransportPolicy::All,
-        bundle_policy: network_types::BundlePolicy::Balanced,
+        ice_transport_policy: IceTransportPolicy::All,
+        bundle_policy: BundlePolicy::Balanced,
     };
 
     // When: creating RTC peer connection

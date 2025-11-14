@@ -11,7 +11,7 @@ fn test_network_config_default() {
     let config = NetworkConfig::default();
 
     // Then: should have sensible defaults
-    assert!(config.http.is_some(), "Should have HTTP config");
+    assert!(config.http1.is_some(), "Should have HTTP/1.1 config");
     assert!(config.websocket.is_some(), "Should have WebSocket config");
     assert!(config.webrtc.is_some(), "Should have WebRTC config");
 }
@@ -30,7 +30,9 @@ fn test_network_config_customization() {
 
     // When: creating NetworkConfig with custom values
     let config = NetworkConfig {
-        http: Some(http_config),
+        http1: Some(http_config),
+        http2: None,
+        http3: None,
         websocket: None,
         webrtc: None,
         cache: None,
@@ -40,6 +42,6 @@ fn test_network_config_customization() {
     };
 
     // Then: custom values should be preserved
-    assert!(config.http.is_some(), "Should have custom HTTP config");
+    assert!(config.http1.is_some(), "Should have custom HTTP/1.1 config");
     assert!(config.websocket.is_none(), "Should not have WebSocket config");
 }
