@@ -221,15 +221,15 @@ impl RequestScheduler {
         }
 
         // Try to remove from priority queues
-        if self.remove_from_queue(&mut self.high_priority, id) {
+        if Self::remove_from_queue(&mut self.high_priority, id) {
             return Ok(());
         }
 
-        if self.remove_from_queue(&mut self.medium_priority, id) {
+        if Self::remove_from_queue(&mut self.medium_priority, id) {
             return Ok(());
         }
 
-        if self.remove_from_queue(&mut self.low_priority, id) {
+        if Self::remove_from_queue(&mut self.low_priority, id) {
             return Ok(());
         }
 
@@ -255,7 +255,7 @@ impl RequestScheduler {
     }
 
     /// Helper to remove a request from a queue by ID
-    fn remove_from_queue(&mut self, queue: &mut VecDeque<PendingRequest>, id: RequestId) -> bool {
+    fn remove_from_queue(queue: &mut VecDeque<PendingRequest>, id: RequestId) -> bool {
         if let Some(pos) = queue.iter().position(|r| r.id == id) {
             queue.remove(pos);
             true
