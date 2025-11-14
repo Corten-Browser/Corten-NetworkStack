@@ -1,17 +1,45 @@
 [workspace]
 members = [
+    # Level 0: Base
     "components/network_types",
     "components/network_errors",
+
+    # Level 1: Core (existing)
     "components/dns_resolver",
     "components/tls_manager",
     "components/cookie_manager",
     "components/http_cache",
+
+    # Level 1: Core (new - Phase 2)
+    "components/proxy_support",
+    "components/cors_validator",
+    "components/content_encoding",
+    "components/request_scheduler",
+    "components/bandwidth_limiter",
+    "components/url_handlers",
+    "components/certificate_transparency",
+    "components/mixed_content_blocker",
+    "components/csp_processor",
+    "components/certificate_pinning",
+    "components/network_metrics",
+    "components/platform_integration",
+
+    # Level 2: Protocol (existing)
     "components/http1_protocol",
     "components/http2_protocol",
     "components/http3_protocol",
     "components/websocket_protocol",
     "components/webrtc_peer",
     "components/webrtc_channels",
+
+    # Level 2: Protocol (new - Phase 2)
+    "components/ftp_protocol",
+
+    # Level 2: Testing (new - Phase 2)
+    "components/wpt_harness",
+    "components/performance_benchmarks",
+
+    # Level 3: Integration
     "components/network_stack",
 ]
 
