@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-network_types = { path = "../network_types" }
-network_errors = { path = "../network_errors" }
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
 tokio = { version = "1.35", features = ["time", "sync", "macros"] }
 
 [dev-dependencies]
