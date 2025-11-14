@@ -201,7 +201,7 @@ pub enum ResponseBody {
     /// Raw bytes (fully loaded)
     Bytes(Vec<u8>),
     /// Streaming response body
-    Stream(Box<dyn Stream<Item = Result<Bytes, NetworkError>> + Send + Unpin>),
+    Stream(Box<dyn Stream<Item = Result<Bytes, NetworkError>> + Send + Sync + Unpin>),
     /// Empty response (no body)
     Empty,
 }
@@ -233,7 +233,7 @@ pub struct FormData {
 /// Body stream for streaming request bodies
 ///
 /// Allows sending request body as a stream of chunks.
-pub type BodyStream = Pin<Box<dyn Stream<Item = Result<Bytes, std::io::Error>> + Send>>;
+pub type BodyStream = Pin<Box<dyn Stream<Item = Result<Bytes, std::io::Error>> + Send + Sync>>;
 
 /// Abort signal for cancelling requests
 ///
