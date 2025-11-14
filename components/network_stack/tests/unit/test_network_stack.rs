@@ -100,8 +100,8 @@ fn test_get_network_status() {
 }
 
 /// Test setting network conditions for throttling
-#[test]
-fn test_set_network_conditions() {
+#[tokio::test]
+async fn test_set_network_conditions() {
     // Given: a NetworkStackImpl
     let config = NetworkConfig::default();
     let mut stack = NetworkStackImpl::new(config).unwrap();
