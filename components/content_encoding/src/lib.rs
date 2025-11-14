@@ -61,7 +61,7 @@ impl ContentEncoder {
     /// Decode a stream of encoded data
     pub fn decode_stream(
         &self,
-        stream: impl Stream<Item = Bytes> + Send + 'static,
+        stream: impl Stream<Item = Bytes> + Send + 'static + Unpin,
         encoding: Encoding,
     ) -> impl Stream<Item = Result<Bytes, NetworkError>> {
         stream::decode_stream(stream, encoding)

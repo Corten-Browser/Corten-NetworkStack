@@ -8,7 +8,7 @@ use crate::Encoding;
 
 /// Decode a stream of encoded bytes
 pub fn decode_stream(
-    input: impl Stream<Item = Bytes> + Send + 'static,
+    input: impl Stream<Item = Bytes> + Send + 'static + Unpin,
     encoding: Encoding,
 ) -> impl Stream<Item = Result<Bytes, NetworkError>> {
     match encoding {
@@ -21,10 +21,10 @@ pub fn decode_stream(
 
 /// Decode a gzip stream
 fn decode_gzip_stream(
-    input: impl Stream<Item = Bytes> + Send + 'static,
+    input: impl Stream<Item = Bytes> + Send + 'static + Unpin,
 ) -> impl Stream<Item = Result<Bytes, NetworkError>> + Send {
     stream::unfold(
-        (input, GzDecoder::new(Vec::new()), Vec::new()),
+        (input, GzDecoder::new(Vec::new()), Vec::<u8>::new()),
         |(mut input, mut decoder, mut buffer)| async move {
             while let Some(chunk) = input.next().await {
                 if let Err(e) = decoder.write_all(&chunk) {
@@ -35,10 +35,9 @@ fn decode_gzip_stream(
                 }
 
                 // Try to flush decoded data
-                if let Ok(decoded) = decoder.get_mut().drain(..).collect::<Vec<u8>>().as_slice().to_vec() {
-                    if !decoded.is_empty() {
-                        return Some((Ok(Bytes::from(decoded)), (input, decoder, buffer)));
-                    }
+                let decoded = decoder.get_mut().drain(..).collect::<Vec<u8>>();
+                if !decoded.is_empty() {
+                    return Some((Ok(Bytes::from(decoded)), (input, decoder, buffer)));
                 }
             }
 
@@ -62,7 +61,7 @@ fn decode_gzip_stream(
 
 /// Decode a deflate stream
 fn decode_deflate_stream(
-    input: impl Stream<Item = Bytes> + Send + 'static,
+    input: impl Stream<Item = Bytes> + Send + 'static + Unpin,
 ) -> impl Stream<Item = Result<Bytes, NetworkError>> + Send {
     stream::unfold(
         (input, DeflateDecoder::new(Vec::new())),
@@ -76,10 +75,9 @@ fn decode_deflate_stream(
                 }
 
                 // Try to flush decoded data
-                if let Ok(decoded) = decoder.get_mut().drain(..).collect::<Vec<u8>>().as_slice().to_vec() {
-                    if !decoded.is_empty() {
-                        return Some((Ok(Bytes::from(decoded)), (input, decoder)));
-                    }
+                let decoded = decoder.get_mut().drain(..).collect::<Vec<u8>>();
+                if !decoded.is_empty() {
+                    return Some((Ok(Bytes::from(decoded)), (input, decoder)));
                 }
             }
 
@@ -103,7 +101,7 @@ fn decode_deflate_stream(
 
 /// Decode a brotli stream
 fn decode_brotli_stream(
-    input: impl Stream<Item = Bytes> + Send + 'static,
+    input: impl Stream<Item = Bytes> + Send + 'static + Unpin,
 ) -> impl Stream<Item = Result<Bytes, NetworkError>> + Send {
     stream::unfold(
         (input, Vec::new()),
@@ -134,7 +132,7 @@ fn decode_brotli_stream(
 
 /// Pass-through stream for identity encoding
 fn decode_identity_stream(
-    input: impl Stream<Item = Bytes> + Send + 'static,
+    input: impl Stream<Item = Bytes> + Send + 'static + Unpin,
 ) -> impl Stream<Item = Result<Bytes, NetworkError>> + Send {
     input.map(|chunk| Ok(chunk))
 }
