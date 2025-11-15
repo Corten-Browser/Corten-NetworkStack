@@ -19,10 +19,10 @@ futures.workspace = true
 url.workspace = true
 
 # Component dependencies
-network_types = { path = "../network_types" }
-network_errors = { path = "../network_errors" }
-tls_manager = { path = "../tls_manager" }
-dns_resolver = { path = "../dns_resolver" }
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+tls-manager = { path = "../tls_manager" }
+dns-resolver = { path = "../dns_resolver" }
 
 # External dependencies
 tokio-util = { version = "0.7", features = ["codec"] }

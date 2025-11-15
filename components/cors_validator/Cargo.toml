@@ -1,0 +1,22 @@
+[package]
+name = "cors-validator"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+http = "1.0"
+url = "2.5"
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[[test]]
+name = "unit"
+path = "tests/unit/mod.rs"
+
+[[test]]
+name = "integration"
+path = "tests/integration/mod.rs"

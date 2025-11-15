@@ -1,0 +1,20 @@
+[package]
+name = "certificate_transparency"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+thiserror.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[test]]
+name = "unit_tests"
+path = "tests/unit/test_verifier.rs"
+
+[[test]]
+name = "integration_tests"
+path = "tests/integration/test_ct_integration.rs"

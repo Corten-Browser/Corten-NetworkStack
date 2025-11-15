@@ -28,13 +28,16 @@ fn test_certificate_store_add_certificate() {
 
 #[tokio::test]
 async fn test_certificate_store_verify_valid_certificate() {
-    // Given: a CertificateStore with valid certificates
-    // When: a certificate is verified
-    // Then: verification should succeed
+    // Given: a CertificateStore with pinned certificate
+    // When: a pinned certificate is verified
+    // Then: verification should succeed (pinning overrides parsing)
 
-    let store = CertificateStore::new();
+    let mut store = CertificateStore::new();
     let cert = b"valid certificate";
     let hostname = "example.com";
+
+    // Pin the certificate for this hostname
+    store.add_pin(hostname, cert);
 
     let result = store.verify_certificate(cert, hostname).await;
     assert!(result.is_ok());

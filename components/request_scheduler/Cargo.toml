@@ -1,0 +1,13 @@
+[package]
+name = "request-scheduler"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[dependencies]
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+
+[dev-dependencies]
+url = "2.5"
+http = "1.0"

@@ -1,0 +1,10 @@
+[package]
+name = "csp_processor"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+url = "2.5"
+
+[lib]
+path = "src/lib.rs"

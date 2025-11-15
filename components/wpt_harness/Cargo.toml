@@ -1,0 +1,9 @@
+[package]
+name = "wpt_harness"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+
+[lib]
+path = "src/lib.rs"

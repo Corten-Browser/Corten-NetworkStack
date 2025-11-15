@@ -79,6 +79,12 @@ pub enum NetworkError {
     #[error("Invalid URL: {0}")]
     InvalidUrl(String),
 
+    /// Invalid configuration
+    ///
+    /// Configuration values are out of valid range or malformed.
+    #[error("Invalid configuration: {0}")]
+    InvalidConfig(String),
+
     /// Too many redirects
     ///
     /// The request followed too many redirects and was terminated.

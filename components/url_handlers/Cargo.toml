@@ -1,0 +1,25 @@
+[package]
+name = "url_handlers"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+# Workspace dependencies
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
+tokio = { workspace = true }
+thiserror = { workspace = true }
+
+# Component-specific dependencies
+base64 = "0.21"
+mime = "0.3"
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "fs"] }
+tempfile = "3.8"
+
+[lib]
+path = "src/lib.rs"

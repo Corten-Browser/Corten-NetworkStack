@@ -414,7 +414,8 @@ mod tests {
     #[tokio::test]
     async fn test_connection_pool() {
         let config = Http2Config::default();
-        let client = Http2Client::new(config).unwrap();
+        let client = Http2Client::new(config)
+            .expect("Failed to create HTTP/2 client in test");
         assert_eq!(client.connection_count().await, 0);
     }
 }

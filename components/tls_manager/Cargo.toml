@@ -7,12 +7,15 @@ rust-version = "1.75"
 [dependencies]
 network-types = { path = "../network_types" }
 network-errors = { path = "../network_errors" }
+certificate_pinning = { path = "../certificate_pinning" }
 rustls = "0.22"
 tokio-rustls = "0.25"
 webpki-roots = "0.26"
 tokio = { version = "1.35", features = ["full"] }
 rustls-pemfile = "2.0"
 thiserror = "1.0"
+x509-parser = "0.16"
+sha2 = "0.10"
 
 [dev-dependencies]
 tokio-test = "0.4"

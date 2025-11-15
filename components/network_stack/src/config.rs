@@ -35,6 +35,40 @@ pub struct NetworkConfig {
 
     /// DNS configuration
     pub dns: Option<dns_resolver::DohConfig>,
+
+    // Phase 2 configurations
+    /// CORS validation configuration
+    pub cors: Option<cors_validator::CorsConfig>,
+
+    /// Content encoding configuration (enabled by default)
+    pub content_encoding: Option<ContentEncodingConfig>,
+
+    /// Request scheduling configuration
+    pub request_scheduling: Option<RequestSchedulingConfig>,
+
+    /// Bandwidth limiting configuration
+    pub bandwidth_limit: Option<u64>,
+
+    /// URL handlers configuration
+    pub url_handlers: Option<UrlHandlersConfig>,
+
+    /// Mixed content blocking configuration
+    pub mixed_content: Option<MixedContentConfig>,
+
+    /// CSP (Content Security Policy) configuration
+    pub csp: Option<CspConfig>,
+
+    /// Certificate transparency configuration
+    pub certificate_transparency: Option<CertificateTransparencyConfig>,
+
+    /// Certificate pinning configuration
+    pub certificate_pinning: Option<CertificatePinningConfig>,
+
+    /// Platform integration configuration
+    pub platform_integration: Option<PlatformIntegrationConfig>,
+
+    /// FTP protocol configuration
+    pub ftp: Option<ftp_protocol::FtpConfig>,
 }
 
 impl Default for NetworkConfig {
@@ -49,6 +83,18 @@ impl Default for NetworkConfig {
             security: Some(SecurityConfig::default()),
             proxy: None,
             dns: Some(dns_resolver::DohConfig::default()),
+            // Phase 2 defaults
+            cors: Some(cors_validator::CorsConfig::default()),
+            content_encoding: Some(ContentEncodingConfig::default()),
+            request_scheduling: Some(RequestSchedulingConfig::default()),
+            bandwidth_limit: None, // No bandwidth limit by default
+            url_handlers: Some(UrlHandlersConfig::default()),
+            mixed_content: Some(MixedContentConfig::default()),
+            csp: None, // No CSP policy by default
+            certificate_transparency: Some(CertificateTransparencyConfig::default()),
+            certificate_pinning: Some(CertificatePinningConfig::default()),
+            platform_integration: Some(PlatformIntegrationConfig::default()),
+            ftp: Some(ftp_protocol::FtpConfig::default()),
         }
     }
 }
@@ -155,4 +201,147 @@ pub struct ProxyAuth {
 
     /// Password
     pub password: String,
+}
+
+// Phase 2 Configuration Structs
+
+/// Content encoding configuration
+#[derive(Debug, Clone)]
+pub struct ContentEncodingConfig {
+    /// Enable content encoding/decoding
+    pub enabled: bool,
+}
+
+impl Default for ContentEncodingConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+        }
+    }
+}
+
+/// Request scheduling configuration
+#[derive(Debug, Clone)]
+pub struct RequestSchedulingConfig {
+    /// Enable request scheduling
+    pub enabled: bool,
+    /// Maximum concurrent requests
+    pub max_concurrent: usize,
+}
+
+impl Default for RequestSchedulingConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            max_concurrent: 6,
+        }
+    }
+}
+
+/// URL handlers configuration
+#[derive(Debug, Clone)]
+pub struct UrlHandlersConfig {
+    /// Enable data: URL handler
+    pub enable_data_urls: bool,
+    /// Enable file: URL handler
+    pub enable_file_urls: bool,
+    /// Allowed file paths for file: URLs
+    pub allowed_file_paths: Vec<std::path::PathBuf>,
+}
+
+impl Default for UrlHandlersConfig {
+    fn default() -> Self {
+        Self {
+            enable_data_urls: true,
+            enable_file_urls: false, // Disabled by default for security
+            allowed_file_paths: vec![],
+        }
+    }
+}
+
+/// Mixed content blocking configuration
+#[derive(Debug, Clone)]
+pub struct MixedContentConfig {
+    /// Block all mixed content (both active and passive)
+    pub block_all_mixed_content: bool,
+    /// Enable upgrade-insecure-requests
+    pub upgrade_insecure_requests: bool,
+}
+
+impl Default for MixedContentConfig {
+    fn default() -> Self {
+        Self {
+            block_all_mixed_content: true,
+            upgrade_insecure_requests: false,
+        }
+    }
+}
+
+/// CSP configuration
+#[derive(Debug, Clone)]
+pub struct CspConfig {
+    /// Default CSP policy
+    pub policy: Option<String>,
+    /// Enable CSP enforcement
+    pub enabled: bool,
+}
+
+impl Default for CspConfig {
+    fn default() -> Self {
+        Self {
+            policy: None,
+            enabled: false,
+        }
+    }
+}
+
+/// Certificate transparency configuration
+#[derive(Debug, Clone)]
+pub struct CertificateTransparencyConfig {
+    /// Require SCT (Signed Certificate Timestamp)
+    pub require_sct: bool,
+    /// Minimum number of SCTs required
+    pub min_sct_count: usize,
+}
+
+impl Default for CertificateTransparencyConfig {
+    fn default() -> Self {
+        Self {
+            require_sct: true,
+            min_sct_count: 2,
+        }
+    }
+}
+
+/// Certificate pinning configuration
+#[derive(Debug, Clone)]
+pub struct CertificatePinningConfig {
+    /// Enable certificate pinning
+    pub enabled: bool,
+}
+
+impl Default for CertificatePinningConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+        }
+    }
+}
+
+/// Platform integration configuration
+#[derive(Debug, Clone)]
+pub struct PlatformIntegrationConfig {
+    /// Enable system proxy detection
+    pub use_system_proxy: bool,
+    /// Enable system certificate store
+    pub use_system_certs: bool,
+}
+
+impl Default for PlatformIntegrationConfig {
+    fn default() -> Self {
+        Self {
+            use_system_proxy: true,
+            use_system_certs: true,
+        }
+    }
 }

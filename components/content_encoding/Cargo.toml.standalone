@@ -1,0 +1,20 @@
+[package]
+name = "content_encoding"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+flate2 = "1.0"
+brotli = "3.4"
+bytes = "1.5"
+futures = "0.3"
+
+[dependencies.network-types]
+path = "../network_types"
+
+[dependencies.network-errors]
+path = "../network_errors"
+
+[dev-dependencies]
+tokio = { version = "1.35", features = ["full"] }
+tokio-test = "0.4"
