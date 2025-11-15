@@ -4,6 +4,17 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+tokio = { workspace = true, features = ["full"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde_bytes = "0.11"
+network-stack = { path = "../network_stack" }
+network-types = { path = "../network_types" }
+network-errors = { path = "../network_errors" }
 
 [lib]
 path = "src/lib.rs"
+
+[[bin]]
+name = "wpt_runner"
+path = "src/bin/wpt_runner.rs"
