@@ -26,3 +26,7 @@ path = "src/bin/wpt_runner.rs"
 [[bin]]
 name = "http_test_runner"
 path = "src/bin/http_test_runner.rs"
+
+[[bin]]
+name = "wpt_test_runner"
+path = "src/bin/wpt_test_runner.rs"

@@ -30,6 +30,8 @@
 use serde::{Deserialize, Serialize};
 
 pub mod http_tests;
+pub mod cors_tests;
+pub mod csp_tests;
 
 /// WPT test request from test server
 #[derive(Debug, Clone, Serialize, Deserialize)]

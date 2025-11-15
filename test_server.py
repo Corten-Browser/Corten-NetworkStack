@@ -17,19 +17,40 @@ class TestRequestHandler(BaseHTTPRequestHandler):
         """Suppress default logging"""
         pass
 
-    def send_json_response(self, status_code, data):
+    def add_cors_headers(self, origin='*', methods='GET, POST, PUT, DELETE, OPTIONS', headers='*', credentials=False):
+        """Add CORS headers to response"""
+        self.send_header('Access-Control-Allow-Origin', origin if not credentials else self.headers.get('Origin', origin))
+        self.send_header('Access-Control-Allow-Methods', methods)
+        self.send_header('Access-Control-Allow-Headers', headers)
+        if credentials:
+            self.send_header('Access-Control-Allow-Credentials', 'true')
+        self.send_header('Access-Control-Max-Age', '86400')
+
+    def add_csp_header(self, policy):
+        """Add Content-Security-Policy header"""
+        self.send_header('Content-Security-Policy', policy)
+
+    def send_json_response(self, status_code, data, cors=False, csp=None):
         """Send JSON response"""
         response = json.dumps(data).encode('utf-8')
         self.send_response(status_code)
+        if cors:
+            self.add_cors_headers()
+        if csp:
+            self.add_csp_header(csp)
         self.send_header('Content-Type', 'application/json')
         self.send_header('Content-Length', str(len(response)))
         self.end_headers()
         self.wfile.write(response)
 
-    def send_text_response(self, status_code, text, content_type='text/plain'):
+    def send_text_response(self, status_code, text, content_type='text/plain', cors=False, csp=None):
         """Send text response"""
         response = text.encode('utf-8')
         self.send_response(status_code)
+        if cors:
+            self.add_cors_headers()
+        if csp:
+            self.add_csp_header(csp)
         self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(response)))
         self.end_headers()
@@ -154,6 +175,71 @@ class TestRequestHandler(BaseHTTPRequestHandler):
                 self.send_response(400)
                 self.end_headers()
 
+        # === CORS Endpoints ===
+        # /cors/simple - Simple CORS request
+        elif path == '/cors/simple':
+            self.send_json_response(200, {
+                'cors': 'simple',
+                'origin': self.headers.get('Origin', 'none')
+            }, cors=True)
+
+        # /cors/credentials - CORS with credentials
+        elif path == '/cors/credentials':
+            origin = self.headers.get('Origin', '*')
+            self.send_response(200)
+            self.add_cors_headers(origin=origin, credentials=True)
+            self.send_header('Content-Type', 'application/json')
+            response = json.dumps({'cors': 'credentials', 'origin': origin}).encode('utf-8')
+            self.send_header('Content-Length', str(len(response)))
+            self.end_headers()
+            self.wfile.write(response)
+
+        # /cors/no-headers - No CORS headers (should fail)
+        elif path == '/cors/no-headers':
+            self.send_json_response(200, {'cors': 'blocked'})
+
+        # /cors/custom-method - Custom method test
+        elif path == '/cors/custom-method':
+            self.send_json_response(200, {'cors': 'custom-method'}, cors=True)
+
+        # === CSP Endpoints ===
+        # /csp/default-src - Test default-src directive
+        elif path == '/csp/default-src':
+            self.send_json_response(200, {'csp': 'default-src'},
+                                    csp="default-src 'self'")
+
+        # /csp/script-src - Test script-src directive
+        elif path == '/csp/script-src':
+            self.send_json_response(200, {'csp': 'script-src'},
+                                    csp="script-src 'self'")
+
+        # /csp/nonce - Test nonce-based CSP
+        elif path.startswith('/csp/nonce/'):
+            nonce = path.split('/')[-1]
+            self.send_json_response(200, {'csp': 'nonce', 'nonce': nonce},
+                                    csp=f"script-src 'nonce-{nonce}'")
+
+        # /csp/hash - Test hash-based CSP
+        elif path == '/csp/hash':
+            # SHA-256 hash of "alert('test')"
+            hash_value = "sha256-qznLcsROx4GACP2dm0UCKCzCG+HiZ1guq6ZZDob/Tng="
+            self.send_json_response(200, {'csp': 'hash'},
+                                    csp=f"script-src '{hash_value}'")
+
+        # /csp/multiple - Multiple CSP directives
+        elif path == '/csp/multiple':
+            self.send_json_response(200, {'csp': 'multiple'},
+                                    csp="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'")
+
+        # /csp/report-uri - CSP with report-uri
+        elif path == '/csp/report-uri':
+            self.send_json_response(200, {'csp': 'report-uri'},
+                                    csp="default-src 'self'; report-uri /csp/report")
+
+        # /csp/report - CSP violation report endpoint
+        elif path == '/csp/report':
+            self.send_json_response(200, {'received': 'report'})
+
         else:
             self.send_response(404)
             self.end_headers()
@@ -217,6 +303,40 @@ class TestRequestHandler(BaseHTTPRequestHandler):
             })
         else:
             self.send_response(404)
+            self.end_headers()
+
+    def do_OPTIONS(self):
+        """Handle OPTIONS requests (CORS preflight)"""
+        path = urlparse(self.path).path
+
+        # CORS preflight for all /cors/* endpoints
+        if path.startswith('/cors/'):
+            origin = self.headers.get('Origin', '*')
+            requested_method = self.headers.get('Access-Control-Request-Method', 'GET')
+            requested_headers = self.headers.get('Access-Control-Request-Headers', '*')
+
+            self.send_response(204)
+
+            # Handle credentials mode
+            if 'credentials' in path:
+                self.add_cors_headers(
+                    origin=origin,
+                    methods=requested_method,
+                    headers=requested_headers,
+                    credentials=True
+                )
+            else:
+                self.add_cors_headers(
+                    origin='*',
+                    methods='GET, POST, PUT, DELETE, OPTIONS',
+                    headers=requested_headers
+                )
+
+            self.end_headers()
+        else:
+            # Standard OPTIONS response
+            self.send_response(200)
+            self.send_header('Allow', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
             self.end_headers()
 
 def run_server(port=8080):
