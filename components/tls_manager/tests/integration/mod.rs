@@ -42,13 +42,13 @@ fn test_complete_tls_configuration() {
 
 #[tokio::test]
 async fn test_certificate_validation_workflow() {
-    // Given: A certificate store with certificates
-    // When: Verifying certificates for different domains
-    // Then: Validation should work correctly
+    // Given: A certificate store with certificate pinning
+    // When: Verifying pinned certificates for different domains
+    // Then: Validation should succeed for pinned certificates
 
     let mut store = CertificateStore::new();
 
-    // Add certificates
+    // Create certificates (using simple data since we're testing pinning)
     let cert1 = b"certificate for domain1.com".to_vec();
     let cert2 = b"certificate for domain2.com".to_vec();
 
@@ -56,9 +56,21 @@ async fn test_certificate_validation_workflow() {
     assert!(store.add_certificate(cert2.clone()).is_ok());
     assert_eq!(store.certificate_count(), 2);
 
-    // Verify certificates
-    let result = store.verify_certificate(&cert1, "domain1.com").await;
-    assert!(result.is_ok());
+    // Pin certificates for their respective domains
+    // Pinning allows these non-standard certificates to validate
+    store.add_pin("domain1.com", &cert1);
+    store.add_pin("domain2.com", &cert2);
+
+    // Verify pinned certificates - should succeed
+    let result1 = store.verify_certificate(&cert1, "domain1.com").await;
+    assert!(result1.is_ok(), "Pinned cert1 should validate");
+
+    let result2 = store.verify_certificate(&cert2, "domain2.com").await;
+    assert!(result2.is_ok(), "Pinned cert2 should validate");
+
+    // Verify that wrong certificate fails (cert1 for domain2)
+    let result_wrong = store.verify_certificate(&cert1, "domain2.com").await;
+    assert!(result_wrong.is_err(), "Wrong pinned cert should fail");
 }
 
 #[test]
