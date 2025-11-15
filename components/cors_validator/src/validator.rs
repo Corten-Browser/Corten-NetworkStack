@@ -17,12 +17,39 @@ pub struct CorsValidator {
 
 impl CorsValidator {
     /// Create a new CORS validator with the given configuration
+    ///
+    /// # Panics
+    ///
+    /// Panics if the configuration is invalid (e.g., wildcard origin with credentials).
+    /// Use `try_new()` for non-panicking version.
     pub fn new(config: CorsConfig) -> Self {
+        config.validate()
+            .expect("Invalid CORS configuration");
+
         Self {
             header_builder: HeaderBuilder::new(config.clone()),
             preflight_checker: PreflightChecker::new(),
             config,
         }
+    }
+
+    /// Create a new CORS validator with the given configuration
+    ///
+    /// Returns an error if the configuration is invalid instead of panicking.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Credentials are enabled with wildcard origin (*)
+    /// - Credentials are enabled with no specific origins
+    pub fn try_new(config: CorsConfig) -> Result<Self, String> {
+        config.validate()?;
+
+        Ok(Self {
+            header_builder: HeaderBuilder::new(config.clone()),
+            preflight_checker: PreflightChecker::new(),
+            config,
+        })
     }
 
     /// Validate a network request

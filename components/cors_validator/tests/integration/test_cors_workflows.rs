@@ -9,6 +9,7 @@ fn test_complete_cors_preflight_workflow() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -40,6 +41,7 @@ fn test_same_origin_workflow_no_preflight() {
     let config = CorsConfig {
         enforce_same_origin: true,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -62,6 +64,7 @@ fn test_credentials_workflow() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: true,
+        allowed_origins: Some(vec!["https://trusted.com".to_string()]),
     };
     let validator = CorsValidator::new(config);
 
@@ -94,6 +97,7 @@ fn test_blocked_cross_origin_workflow() {
     let config = CorsConfig {
         enforce_same_origin: true,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 

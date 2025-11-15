@@ -9,6 +9,7 @@ fn test_access_control_allow_origin_header_added() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -31,6 +32,7 @@ fn test_access_control_allow_credentials_header() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: true,
+        allowed_origins: Some(vec!["https://trusted.com".to_string()]),
     };
     let validator = CorsValidator::new(config);
 
@@ -53,6 +55,7 @@ fn test_no_credentials_header_when_disabled() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -74,6 +77,7 @@ fn test_wildcard_origin_in_response() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -96,6 +100,7 @@ fn test_access_control_allow_methods_in_preflight() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 

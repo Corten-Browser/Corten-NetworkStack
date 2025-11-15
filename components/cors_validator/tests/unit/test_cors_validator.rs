@@ -1,4 +1,4 @@
-use cors_validator::{CorsValidator, CorsConfig, CorsResult};
+use cors_validator::{CorsValidator, CorsConfig};
 use network_types::{NetworkRequest, NetworkResponse, HttpMethod, RequestMode, CredentialsMode};
 use url::Url;
 use http::HeaderMap;
@@ -9,11 +9,12 @@ fn test_same_origin_request_allowed() {
     let config = CorsConfig {
         enforce_same_origin: true,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
     // When: Request from same origin
-    let mut request = create_test_request("https://example.com/api", HttpMethod::Get);
+    let request = create_test_request("https://example.com/api", HttpMethod::Get);
     let origin = "https://example.com";
 
     let result = validator.validate_request(&request, origin);
@@ -29,6 +30,7 @@ fn test_cross_origin_request_blocked_with_same_origin_enforcement() {
     let config = CorsConfig {
         enforce_same_origin: true,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -50,6 +52,7 @@ fn test_cross_origin_request_allowed_without_enforcement() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -69,6 +72,7 @@ fn test_preflight_needed_for_cors_mode() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -87,6 +91,7 @@ fn test_preflight_not_needed_for_same_origin_mode() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -105,6 +110,7 @@ fn test_preflight_not_needed_for_simple_get_request() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -123,6 +129,7 @@ fn test_credential_mode_validation() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: true,
+        allowed_origins: Some(vec!["https://example.com".to_string()]),
     };
     let validator = CorsValidator::new(config);
 
@@ -144,6 +151,7 @@ fn test_validate_response_adds_cors_headers() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -165,6 +173,7 @@ fn test_build_preflight_request() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
     let request = create_test_request("https://example.com/api", HttpMethod::Post);
@@ -183,6 +192,7 @@ fn test_wildcard_origin_handling() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -202,6 +212,7 @@ fn test_wildcard_origin_blocked_with_credentials() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: true,
+        allowed_origins: Some(vec!["https://example.com".to_string()]),
     };
     let validator = CorsValidator::new(config);
 
@@ -214,6 +225,135 @@ fn test_wildcard_origin_blocked_with_credentials() {
     // Then: Should be blocked (wildcard not allowed with credentials)
     assert!(!result.allowed);
     assert!(result.reason.is_some());
+}
+
+// Configuration validation tests
+#[test]
+#[should_panic(expected = "Invalid CORS configuration")]
+fn test_reject_wildcard_with_credentials_none() {
+    // Given: CORS config with credentials enabled but no specific origins (None = wildcard)
+    let config = CorsConfig {
+        enforce_same_origin: false,
+        allow_credentials: true,
+        allowed_origins: None,
+    };
+
+    // When/Then: Creating validator should panic
+    CorsValidator::new(config);
+}
+
+#[test]
+#[should_panic(expected = "Invalid CORS configuration")]
+fn test_reject_wildcard_with_credentials_explicit() {
+    // Given: CORS config with credentials enabled and explicit wildcard
+    let config = CorsConfig {
+        enforce_same_origin: false,
+        allow_credentials: true,
+        allowed_origins: Some(vec!["*".to_string()]),
+    };
+
+    // When/Then: Creating validator should panic
+    CorsValidator::new(config);
+}
+
+#[test]
+fn test_allow_wildcard_without_credentials() {
+    // Given: CORS config with wildcard but no credentials
+    let config = CorsConfig {
+        enforce_same_origin: false,
+        allow_credentials: false,
+        allowed_origins: Some(vec!["*".to_string()]),
+    };
+
+    // When: Creating validator
+    let _validator = CorsValidator::new(config);
+
+    // Then: Should succeed (wildcard OK without credentials)
+    // Validator created successfully without panic
+}
+
+#[test]
+fn test_allow_specific_origins_with_credentials() {
+    // Given: CORS config with specific origins and credentials
+    let config = CorsConfig {
+        enforce_same_origin: false,
+        allow_credentials: true,
+        allowed_origins: Some(vec!["https://example.com".to_string()]),
+    };
+
+    // When: Creating validator
+    let _validator = CorsValidator::new(config);
+
+    // Then: Should succeed (specific origin OK with credentials)
+    // Validator created successfully without panic
+}
+
+#[test]
+fn test_try_new_returns_error_for_wildcard_with_credentials() {
+    // Given: CORS config with wildcard and credentials
+    let config = CorsConfig {
+        enforce_same_origin: false,
+        allow_credentials: true,
+        allowed_origins: Some(vec!["*".to_string()]),
+    };
+
+    // When: Using try_new
+    let result = CorsValidator::try_new(config);
+
+    // Then: Should return error
+    assert!(result.is_err());
+    if let Err(error_msg) = result {
+        assert!(error_msg.contains("wildcard"));
+        assert!(error_msg.contains("credentials"));
+    }
+}
+
+#[test]
+fn test_try_new_succeeds_for_valid_config() {
+    // Given: Valid CORS config with specific origins and credentials
+    let config = CorsConfig {
+        enforce_same_origin: false,
+        allow_credentials: true,
+        allowed_origins: Some(vec!["https://example.com".to_string(), "https://api.example.com".to_string()]),
+    };
+
+    // When: Using try_new
+    let result = CorsValidator::try_new(config);
+
+    // Then: Should succeed
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_config_validate_method() {
+    // Given: Invalid config (wildcard with credentials)
+    let invalid_config = CorsConfig {
+        enforce_same_origin: false,
+        allow_credentials: true,
+        allowed_origins: None,
+    };
+
+    // When: Calling validate
+    let result = invalid_config.validate();
+
+    // Then: Should return error
+    assert!(result.is_err());
+    if let Err(err) = result {
+        assert!(err.contains("wildcard"));
+    }
+
+    // Given: Valid config
+    let valid_config = CorsConfig {
+        enforce_same_origin: false,
+        allow_credentials: true,
+        allowed_origins: Some(vec!["https://example.com".to_string()]),
+    };
+
+    // When: Calling validate
+    let result = valid_config.validate();
+
+    // Then: Should succeed
+    assert!(result.is_ok());
 }
 
 // Helper functions to create test data

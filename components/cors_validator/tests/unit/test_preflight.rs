@@ -9,6 +9,7 @@ fn test_preflight_for_put_request() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -27,6 +28,7 @@ fn test_preflight_for_delete_request() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -45,6 +47,7 @@ fn test_preflight_for_patch_request() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -63,6 +66,7 @@ fn test_preflight_request_has_correct_headers() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
     let request = create_cors_request("https://api.example.com/data", HttpMethod::Post);
@@ -82,6 +86,7 @@ fn test_no_preflight_for_head_request() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 
@@ -100,6 +105,7 @@ fn test_no_preflight_for_no_cors_mode() {
     let config = CorsConfig {
         enforce_same_origin: false,
         allow_credentials: false,
+        allowed_origins: None,
     };
     let validator = CorsValidator::new(config);
 

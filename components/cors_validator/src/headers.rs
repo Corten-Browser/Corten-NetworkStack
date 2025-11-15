@@ -146,6 +146,7 @@ mod tests {
         let config = CorsConfig {
             enforce_same_origin: false,
             allow_credentials: true,
+            allowed_origins: Some(vec!["https://example.com".to_string()]),
         };
         let builder = HeaderBuilder::new(config);
         let headers = builder.build_response_headers(
@@ -165,6 +166,7 @@ mod tests {
         let config = CorsConfig {
             enforce_same_origin: false,
             allow_credentials: false,
+            allowed_origins: None,
         };
         let builder = HeaderBuilder::new(config);
         let headers = builder.build_response_headers(

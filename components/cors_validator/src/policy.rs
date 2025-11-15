@@ -16,6 +16,13 @@ pub struct CorsConfig {
     /// If true, Access-Control-Allow-Credentials: true header is added to responses.
     /// Note: Cannot use wildcard (*) origin when credentials are allowed.
     pub allow_credentials: bool,
+
+    /// Allowed origins for CORS requests
+    ///
+    /// If None, all origins are allowed (equivalent to wildcard).
+    /// If Some, only the specified origins are allowed.
+    /// Note: Cannot include wildcard (*) when credentials are allowed.
+    pub allowed_origins: Option<Vec<String>>,
 }
 
 impl Default for CorsConfig {
@@ -23,6 +30,7 @@ impl Default for CorsConfig {
         Self {
             enforce_same_origin: false,
             allow_credentials: false,
+            allowed_origins: None,
         }
     }
 }
@@ -33,6 +41,7 @@ impl CorsConfig {
         Self {
             enforce_same_origin,
             allow_credentials,
+            allowed_origins: None,
         }
     }
 
@@ -41,6 +50,7 @@ impl CorsConfig {
         Self {
             enforce_same_origin: true,
             allow_credentials: false,
+            allowed_origins: None,
         }
     }
 
@@ -49,6 +59,7 @@ impl CorsConfig {
         Self {
             enforce_same_origin: false,
             allow_credentials: false,
+            allowed_origins: None,
         }
     }
 
@@ -57,6 +68,42 @@ impl CorsConfig {
         Self {
             enforce_same_origin: false,
             allow_credentials: true,
+            allowed_origins: None,
         }
+    }
+
+    /// Validates the CORS configuration for security issues
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Credentials are enabled with wildcard origin (*)
+    /// - Credentials are enabled with no specific origins (None)
+    ///
+    /// # Returns
+    ///
+    /// Ok(()) if the configuration is valid, Err with a descriptive message otherwise.
+    pub fn validate(&self) -> Result<(), String> {
+        // Check for wildcard origin with credentials
+        if self.allow_credentials {
+            match &self.allowed_origins {
+                None => {
+                    return Err(
+                        "CORS misconfiguration: Cannot use wildcard origin (*) with credentials. \
+                         Specify explicit allowed origins when credentials are enabled.".to_string()
+                    );
+                }
+                Some(origins) => {
+                    // Check if any origin is wildcard
+                    if origins.iter().any(|origin| origin == "*") {
+                        return Err(
+                            "CORS misconfiguration: Cannot use wildcard origin (*) with credentials. \
+                             Remove '*' from allowed_origins or disable credentials.".to_string()
+                        );
+                    }
+                }
+            }
+        }
+        Ok(())
     }
 }
