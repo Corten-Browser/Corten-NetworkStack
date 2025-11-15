@@ -1,12 +1,15 @@
 use csp_processor::{CspDirective, CspProcessor, CspViolation};
+use url::Url;
 
 #[test]
 fn test_complete_csp_workflow() {
     // Given: A comprehensive CSP policy
     let header = "default-src 'self'; script-src 'nonce-abc123' *.cdn.com https://trusted.com; style-src 'unsafe-inline'";
 
-    // When: Creating a processor
-    let processor = CspProcessor::new(header).unwrap();
+    // When: Creating a processor with document origin
+    let processor = CspProcessor::new(header)
+        .unwrap()
+        .with_document_origin(Url::parse("https://example.com").unwrap());
 
     // Then: Should correctly validate various sources
 
@@ -32,8 +35,10 @@ fn test_real_world_strict_policy() {
     // Given: A strict real-world CSP policy
     let header = "default-src 'none'; script-src 'self' https://cdn.example.com; img-src *; connect-src 'self'";
 
-    // When: Creating a processor
-    let processor = CspProcessor::new(header).unwrap();
+    // When: Creating a processor with document origin
+    let processor = CspProcessor::new(header)
+        .unwrap()
+        .with_document_origin(Url::parse("https://example.com").unwrap());
 
     // Then: Should enforce strict rules
 
@@ -90,7 +95,9 @@ fn test_subdomain_wildcard_patterns() {
 fn test_multiple_source_types() {
     // Given: CSP with mixed source types
     let header = "script-src 'self' 'unsafe-inline' 'nonce-xyz' https://cdn.com";
-    let processor = CspProcessor::new(header).unwrap();
+    let processor = CspProcessor::new(header)
+        .unwrap()
+        .with_document_origin(Url::parse("https://example.com").unwrap());
 
     // Then: All types should work
     assert!(processor.check_source(CspDirective::ScriptSrc, "https://example.com/app.js")); // self

@@ -7,6 +7,7 @@
 #![warn(rust_2018_idioms)]
 
 use std::collections::HashMap;
+use url::Url;
 
 /// CSP directive types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -59,6 +60,8 @@ pub struct CspViolation {
 #[derive(Debug)]
 pub struct CspProcessor {
     policy: CspPolicy,
+    /// The document's origin for 'self' checks (scheme + host + port)
+    document_origin: Option<Url>,
 }
 
 /// Custom error type for CSP operations
@@ -79,7 +82,21 @@ impl CspProcessor {
     /// Create a new CSP processor from a header string
     pub fn new(header: &str) -> Result<Self, CspError> {
         let policy = Self::parse_header(header)?;
-        Ok(Self { policy })
+        Ok(Self {
+            policy,
+            document_origin: None,
+        })
+    }
+
+    /// Set the document origin for 'self' checks (builder pattern)
+    pub fn with_document_origin(mut self, origin: Url) -> Self {
+        self.document_origin = Some(origin);
+        self
+    }
+
+    /// Set the document origin for 'self' checks (mutable)
+    pub fn set_document_origin(&mut self, origin: Url) {
+        self.document_origin = Some(origin);
     }
 
     /// Parse a CSP header into a policy
@@ -142,15 +159,47 @@ impl CspProcessor {
         }
     }
 
+    /// Check if a source matches the 'self' keyword
+    ///
+    /// The 'self' keyword matches only sources from the same origin as the document.
+    /// Origin is defined as: scheme + host + port
+    fn check_self_source(&self, source: &str) -> bool {
+        // Parse the source URL
+        let source_url = match Url::parse(source) {
+            Ok(url) => url,
+            Err(_) => return false, // Invalid URL doesn't match 'self'
+        };
+
+        // Get document origin (if set)
+        let document_origin = match &self.document_origin {
+            Some(origin) => origin,
+            None => {
+                // No document origin set - cannot verify 'self'
+                // For security, reject rather than allowing all
+                return false;
+            }
+        };
+
+        // Compare origins (scheme + host + port)
+        // All three must match exactly for same-origin
+        document_origin.scheme() == source_url.scheme()
+            && document_origin.host_str() == source_url.host_str()
+            && document_origin.port() == source_url.port()
+    }
+
     /// Check if a source matches an allowed source pattern
     fn source_matches(&self, allowed: &str, actual: &str) -> bool {
         // Handle 'self'
         if allowed == "'self'" {
-            // Simple 'self' check - would need proper origin comparison in production
+            return self.check_self_source(actual);
+        }
+
+        // Handle wildcard '*' (allows any source)
+        if allowed == "*" {
             return true;
         }
 
-        // Handle wildcards
+        // Handle subdomain wildcards (*.example.com)
         if allowed.starts_with("*.") {
             let domain_suffix = &allowed[2..]; // Remove "*."
             if let Some(host) = Self::extract_host(actual) {
@@ -163,8 +212,15 @@ impl CspProcessor {
         }
 
         // Exact domain match
-        if let Some(host) = Self::extract_host(actual) {
-            return host == allowed || host.starts_with(&format!("{}:", allowed));
+        if let Some(actual_host) = Self::extract_host(actual) {
+            // If allowed is a full URL, extract its host
+            let allowed_host = if allowed.contains("://") {
+                Self::extract_host(allowed).unwrap_or(allowed.to_string())
+            } else {
+                allowed.to_string()
+            };
+
+            return actual_host == allowed_host || actual_host.starts_with(&format!("{}:", allowed_host));
         }
 
         false

@@ -724,6 +724,9 @@ dependencies = [
 [[package]]
 name = "csp_processor"
 version = "0.1.0"
+dependencies = [
+ "url",
+]
 
 [[package]]
 name = "ctr"
