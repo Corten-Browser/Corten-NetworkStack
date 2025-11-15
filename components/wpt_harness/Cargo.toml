@@ -8,9 +8,13 @@ tokio = { workspace = true, features = ["full"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_bytes = "0.11"
+url = { workspace = true }
+http = "1.0"
+chrono = "0.4"
 network-stack = { path = "../network_stack" }
 network-types = { path = "../network_types" }
 network-errors = { path = "../network_errors" }
+http1-protocol = { path = "../http1_protocol" }
 
 [lib]
 path = "src/lib.rs"
@@ -18,3 +22,7 @@ path = "src/lib.rs"
 [[bin]]
 name = "wpt_runner"
 path = "src/bin/wpt_runner.rs"
+
+[[bin]]
+name = "http_test_runner"
+path = "src/bin/http_test_runner.rs"
