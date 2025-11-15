@@ -12,7 +12,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("║   HTTP Test Suite - NetworkStack API Bridge                 ║");
     println!("╚══════════════════════════════════════════════════════════════╝\n");
 
-    println!("Test Target: httpbin.org (public HTTP testing service)");
+    println!("Test Target: http://127.0.0.1:8080 (local test server)");
     println!("Protocol: HTTP/1.1 via NetworkStack");
     println!("Test Categories: fetch, xhr, status codes, headers, encoding\n");
     println!("═══════════════════════════════════════════════════════════════\n");

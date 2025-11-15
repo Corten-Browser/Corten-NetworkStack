@@ -36,6 +36,36 @@ This document outlines the approach for integrating the Corten-NetworkStack with
 **Size**: 266MB (shallow clone)
 **Test Runner**: Python-based wptrunner
 **Test Format**: HTML/JavaScript (browser-oriented)
+**Test Server**: Built-in `wptserve` (runs on localhost)
+
+### WPT Local Test Server
+
+**Critical Discovery**: WPT includes a local test server that eliminates the need for external network access.
+
+**How it works**:
+```bash
+cd /home/user/wpt
+./wpt serve
+
+# Server starts on:
+# http://localhost:8000/   (HTTP)
+# https://localhost:8443/  (HTTPS)
+# ws://localhost:9000/     (WebSocket)
+```
+
+**Advantages**:
+- ✅ No external network required (works in sandboxed environments)
+- ✅ No DNS resolution needed (localhost)
+- ✅ Faster than internet requests
+- ✅ More reliable (no network flakiness)
+- ✅ Matches official WPT testing methodology
+- ✅ All 2,108 tests served locally
+
+**Test URLs**:
+- Fetch tests: `http://localhost:8000/fetch/api/...`
+- XHR tests: `http://localhost:8000/xhr/...`
+- WebSocket tests: `ws://localhost:9000/websockets/...`
+- CORS tests: `http://localhost:8000/cors/...`
 
 ---
 
@@ -107,8 +137,10 @@ This document outlines the approach for integrating the Corten-NetworkStack with
 
 **Notes**:
 - Infrastructure complete and functional
-- Test execution blocked by DNS resolution (sandboxed environment)
-- Ready for network-enabled deployment
+- v0.2.0 initially used httpbin.org (external service)
+- **Correction**: WPT tests should use local test server (localhost)
+- Phase 2.5 will update tests to use `localhost:8000` instead of httpbin.org
+- No external network required with local WPT server
 
 ### Phase 3: Full Execution ⏳ **FUTURE**
 

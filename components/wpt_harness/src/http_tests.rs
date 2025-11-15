@@ -1,7 +1,7 @@
 //! Comprehensive HTTP Test Suite for WPT Integration
 //!
-//! This test suite validates NetworkStack functionality against real HTTP endpoints,
-//! providing equivalent validation to WPT tests without requiring a browser environment.
+//! This test suite validates NetworkStack functionality against a local HTTP test server,
+//! providing equivalent validation to WPT tests without requiring external network access.
 
 use crate::{WptHarness, WptRequest, WptResponse, WptTestResult, WptTestStats};
 use std::collections::HashMap;
@@ -14,7 +14,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "basic_get".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/get".to_string(),
+                url: "http://127.0.0.1:8080/get".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -25,7 +25,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "basic_post".to_string(),
             WptRequest {
                 method: "POST".to_string(),
-                url: "https://httpbin.org/post".to_string(),
+                url: "http://127.0.0.1:8080/post".to_string(),
                 headers: [("Content-Type".to_string(), "application/json".to_string())]
                     .into_iter()
                     .collect(),
@@ -38,7 +38,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "method_put".to_string(),
             WptRequest {
                 method: "PUT".to_string(),
-                url: "https://httpbin.org/put".to_string(),
+                url: "http://127.0.0.1:8080/put".to_string(),
                 headers: HashMap::new(),
                 body: Some(b"test data".to_vec()),
                 timeout_ms: Some(30000),
@@ -49,7 +49,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "method_delete".to_string(),
             WptRequest {
                 method: "DELETE".to_string(),
-                url: "https://httpbin.org/delete".to_string(),
+                url: "http://127.0.0.1:8080/delete".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -60,7 +60,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "method_patch".to_string(),
             WptRequest {
                 method: "PATCH".to_string(),
-                url: "https://httpbin.org/patch".to_string(),
+                url: "http://127.0.0.1:8080/patch".to_string(),
                 headers: HashMap::new(),
                 body: Some(b"patch data".to_vec()),
                 timeout_ms: Some(30000),
@@ -73,7 +73,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "status_200_ok".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/status/200".to_string(),
+                url: "http://127.0.0.1:8080/status/200".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -84,7 +84,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "status_201_created".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/status/201".to_string(),
+                url: "http://127.0.0.1:8080/status/201".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -95,7 +95,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "status_204_no_content".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/status/204".to_string(),
+                url: "http://127.0.0.1:8080/status/204".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -106,7 +106,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "status_400_bad_request".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/status/400".to_string(),
+                url: "http://127.0.0.1:8080/status/400".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -117,7 +117,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "status_404_not_found".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/status/404".to_string(),
+                url: "http://127.0.0.1:8080/status/404".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -128,7 +128,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "status_500_server_error".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/status/500".to_string(),
+                url: "http://127.0.0.1:8080/status/500".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -141,7 +141,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "request_headers".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/headers".to_string(),
+                url: "http://127.0.0.1:8080/headers".to_string(),
                 headers: [
                     ("X-Custom-Header".to_string(), "test-value".to_string()),
                     ("User-Agent".to_string(), "WPT-Test/1.0".to_string()),
@@ -157,7 +157,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "response_headers_json".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/response-headers?Content-Type=application/json".to_string(),
+                url: "http://127.0.0.1:8080/response-headers?Content-Type=application/json".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -170,7 +170,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "redirect_302".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/redirect/1".to_string(),
+                url: "http://127.0.0.1:8080/redirect/1".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -183,7 +183,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "content_type_json".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/json".to_string(),
+                url: "http://127.0.0.1:8080/json".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -194,7 +194,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "content_type_html".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/html".to_string(),
+                url: "http://127.0.0.1:8080/html".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -207,7 +207,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "gzip_encoding".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/gzip".to_string(),
+                url: "http://127.0.0.1:8080/gzip".to_string(),
                 headers: [("Accept-Encoding".to_string(), "gzip".to_string())]
                     .into_iter()
                     .collect(),
@@ -220,7 +220,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "deflate_encoding".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/deflate".to_string(),
+                url: "http://127.0.0.1:8080/deflate".to_string(),
                 headers: [("Accept-Encoding".to_string(), "deflate".to_string())]
                     .into_iter()
                     .collect(),
@@ -235,7 +235,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "utf8_response".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/encoding/utf8".to_string(),
+                url: "http://127.0.0.1:8080/encoding/utf8".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -248,7 +248,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "cache_control".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/cache/60".to_string(),
+                url: "http://127.0.0.1:8080/cache/60".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -261,7 +261,7 @@ pub fn create_http_test_suite() -> Vec<(String, WptRequest, fn(&WptResponse) -> 
             "delay_1s".to_string(),
             WptRequest {
                 method: "GET".to_string(),
-                url: "https://httpbin.org/delay/1".to_string(),
+                url: "http://127.0.0.1:8080/delay/1".to_string(),
                 headers: HashMap::new(),
                 body: None,
                 timeout_ms: Some(30000),
@@ -278,7 +278,7 @@ pub async fn run_http_test_suite() -> WptTestStats {
 
     let tests = create_http_test_suite();
 
-    println!("Running {} HTTP tests against httpbin.org...\n", tests.len());
+    println!("Running {} HTTP tests against local test server (127.0.0.1:8080)...\n", tests.len());
 
     for (name, request, validator) in tests {
         print!("  {} ... ", name);
