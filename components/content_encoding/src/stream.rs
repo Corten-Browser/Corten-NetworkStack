@@ -148,7 +148,9 @@ mod tests {
         let input = stream::iter(data.clone());
         let mut output = decode_stream(input, Encoding::Identity);
 
-        let result = output.next().await.unwrap().unwrap();
+        let result = output.next().await
+            .expect("Stream should have next item")
+            .expect("Decoding should succeed");
         assert_eq!(result, data[0]);
     }
 }

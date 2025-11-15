@@ -173,7 +173,8 @@ impl HttpCache {
     pub fn new(config: CacheConfig) -> Self {
         // Calculate capacity based on average response size (assume 10KB avg)
         let capacity = ((config.max_size_bytes / 10240) as usize).max(10);
-        let cache_size = NonZeroUsize::new(capacity).unwrap_or(NonZeroUsize::new(10).unwrap());
+        let cache_size = NonZeroUsize::new(capacity)
+            .unwrap_or_else(|| NonZeroUsize::new(10).expect("Default cache size should be non-zero"));
 
         Self {
             config,

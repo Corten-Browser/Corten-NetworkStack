@@ -182,13 +182,19 @@ impl Http3Client {
 
         // Configure transport
         let mut transport_config = quinn::TransportConfig::default();
-        transport_config.max_idle_timeout(Some(self.config.max_idle_timeout.try_into().unwrap()));
-        transport_config.initial_mtu(self.config.max_udp_payload_size.try_into().unwrap());
+        let idle_timeout = self.config.max_idle_timeout.try_into()
+            .map_err(|_| NetworkError::InvalidConfig("Invalid max_idle_timeout value".to_string()))?;
+        transport_config.max_idle_timeout(Some(idle_timeout));
+        let initial_mtu = self.config.max_udp_payload_size.try_into()
+            .map_err(|_| NetworkError::InvalidConfig("Invalid max_udp_payload_size value".to_string()))?;
+        transport_config.initial_mtu(initial_mtu);
 
         client_config.transport_config(Arc::new(transport_config));
 
         // Create endpoint
-        let mut endpoint = Endpoint::client("0.0.0.0:0".parse().unwrap()).map_err(|e| {
+        let bind_addr = "0.0.0.0:0".parse()
+            .expect("Static bind address should be valid");
+        let mut endpoint = Endpoint::client(bind_addr).map_err(|e| {
             NetworkError::ConnectionFailed(format!("Failed to create endpoint: {}", e))
         })?;
 

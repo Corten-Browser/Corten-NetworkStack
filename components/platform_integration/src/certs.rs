@@ -42,7 +42,8 @@ mod tests {
 
     #[test]
     fn test_get_system_cert_store_returns_vec() {
-        let certs = get_system_cert_store().unwrap();
+        let certs = get_system_cert_store()
+            .expect("Failed to get system certificate store");
         // Should return a Vec<Vec<u8>>
         assert_eq!(certs.len(), 0); // Basic implementation returns empty
     }

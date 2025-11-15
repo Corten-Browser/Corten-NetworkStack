@@ -31,7 +31,8 @@ pub fn is_online() -> bool {
     const TIMEOUT: Duration = Duration::from_secs(1);
 
     TcpStream::connect_timeout(
-        &DNS_SERVER.parse().unwrap(),
+        &DNS_SERVER.parse()
+            .expect("DNS_SERVER constant should be valid IP address"),
         TIMEOUT
     ).is_ok()
 }

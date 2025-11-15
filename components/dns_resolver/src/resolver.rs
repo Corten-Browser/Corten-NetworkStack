@@ -147,7 +147,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_cache_operations() {
-        let resolver = StandardResolver::new(None).unwrap();
+        let resolver = StandardResolver::new(None)
+            .expect("Failed to create DNS resolver in test");
 
         // Cache should be empty initially
         assert_eq!(resolver.cache_size().await, 0);
@@ -159,7 +160,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_clear_cache() {
-        let resolver = StandardResolver::new(None).unwrap();
+        let resolver = StandardResolver::new(None)
+            .expect("Failed to create DNS resolver in test");
         resolver.clear_cache().await;
         assert_eq!(resolver.cache_size().await, 0);
     }

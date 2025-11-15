@@ -57,7 +57,8 @@ impl PreflightChecker {
         let method_str = method_to_string(&request.method);
         preflight.headers.insert(
             "Access-Control-Request-Method",
-            HeaderValue::from_str(&method_str).unwrap(),
+            HeaderValue::from_str(&method_str)
+                .unwrap_or_else(|_| HeaderValue::from_static("GET")),
         );
 
         // If original request has custom headers, add Access-Control-Request-Headers
@@ -70,7 +71,8 @@ impl PreflightChecker {
             let header_names_str = header_names.join(", ");
             preflight.headers.insert(
                 "Access-Control-Request-Headers",
-                HeaderValue::from_str(&header_names_str).unwrap(),
+                HeaderValue::from_str(&header_names_str)
+                    .unwrap_or_else(|_| HeaderValue::from_static("")),
             );
         }
 
