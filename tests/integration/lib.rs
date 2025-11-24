@@ -11,6 +11,7 @@ pub mod test_cache_http;
 pub mod test_websocket;
 pub mod test_network_stack;
 pub mod test_network_stack_integration;
+pub mod test_curl_compat;
 
 // Re-export commonly used types
 pub use network_types::{NetworkRequest, NetworkResponse, HttpMethod};

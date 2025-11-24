@@ -1,5 +1,7 @@
 // Unit tests for http1_protocol
 
+mod test_curl_behavior;
+
 mod test_config {
     use std::time::Duration;
 
