@@ -41,6 +41,9 @@ members = [
 
     # Level 3: Integration
     "components/network_stack",
+
+    # Tests
+    "tests/integration",
 ]
 
 [workspace.package]

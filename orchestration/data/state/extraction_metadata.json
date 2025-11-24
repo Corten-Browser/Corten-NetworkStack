@@ -1,18 +1,25 @@
 {
-  "last_extraction": "2025-11-24T07:13:58.185471",
-  "extraction_method": "pending-llm",
+  "last_extraction": "2025-11-24T07:15:30.000000",
+  "extraction_method": "hybrid",
   "spec_files": [
     {
       "path": "specifications/network-stack-specification.md",
-      "features_extracted": 67,
-      "extraction_method": "automated",
-      "last_processed": "2025-11-24T07:13:58.185518"
+      "features_extracted": 98,
+      "extraction_method": "llm",
+      "last_processed": "2025-11-24T07:15:30.000000"
     }
   ],
-  "total_features": 0,
+  "total_features": 98,
   "automated_features": 0,
-  "llm_features": 0,
-  "llm_extraction_complete": false,
-  "llm_extraction_timestamp": null,
-  "automated_extraction_success": false
+  "llm_features": 98,
+  "llm_extraction_complete": true,
+  "llm_extraction_timestamp": "2025-11-24T07:15:30.000000",
+  "automated_extraction_success": false,
+  "detected_language": "rust",
+  "language_confidence": "high",
+  "language_indicators": {
+    "Cargo.toml": 10,
+    "rust_keywords": 45,
+    ".rs_files": 30
+  }
 }
