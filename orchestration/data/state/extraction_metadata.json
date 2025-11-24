@@ -1,0 +1,18 @@
+{
+  "last_extraction": "2025-11-24T07:13:58.185471",
+  "extraction_method": "pending-llm",
+  "spec_files": [
+    {
+      "path": "specifications/network-stack-specification.md",
+      "features_extracted": 67,
+      "extraction_method": "automated",
+      "last_processed": "2025-11-24T07:13:58.185518"
+    }
+  ],
+  "total_features": 0,
+  "automated_features": 0,
+  "llm_features": 0,
+  "llm_extraction_complete": false,
+  "llm_extraction_timestamp": null,
+  "automated_extraction_success": false
+}

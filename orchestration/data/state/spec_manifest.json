@@ -1,6 +1,9 @@
 {
-  "spec_file": null,
-  "queue_initialized": false,
-  "last_sync": null,
-  "task_count": 0
+  "spec_file": "specifications/network-stack-specification.md",
+  "queue_initialized": true,
+  "last_sync": "2025-11-24T07:13:58.185317",
+  "task_count": 0,
+  "spec_files": [
+    "specifications/network-stack-specification.md"
+  ]
 }
