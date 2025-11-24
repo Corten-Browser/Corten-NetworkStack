@@ -19,9 +19,10 @@ use url::Url;
 /// HTTP methods enum
 ///
 /// Represents standard HTTP request methods as defined in RFC 7231.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 pub enum HttpMethod {
-    /// GET method - retrieve data
+    /// GET method - retrieve data (default)
+    #[default]
     Get,
     /// HEAD method - retrieve headers only
     Head,
@@ -44,7 +45,7 @@ pub enum HttpMethod {
 /// Request modes for CORS handling
 ///
 /// Controls how the request interacts with CORS (Cross-Origin Resource Sharing) rules.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 pub enum RequestMode {
     /// Navigate mode - for navigation requests
     Navigate,
@@ -52,18 +53,20 @@ pub enum RequestMode {
     SameOrigin,
     /// No-CORS mode - simple requests that don't trigger CORS preflight
     NoCors,
-    /// CORS mode - full CORS handling with preflight
+    /// CORS mode - full CORS handling with preflight (default)
+    #[default]
     Cors,
 }
 
 /// Credentials mode for request authentication
 ///
 /// Controls whether credentials (cookies, authorization headers) are included in requests.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 pub enum CredentialsMode {
     /// Omit credentials entirely
     Omit,
-    /// Include credentials only for same-origin requests
+    /// Include credentials only for same-origin requests (default)
+    #[default]
     SameOrigin,
     /// Always include credentials, even for cross-origin requests
     Include,
@@ -72,9 +75,10 @@ pub enum CredentialsMode {
 /// Cache modes for cache control
 ///
 /// Controls how the request interacts with HTTP caching.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 pub enum CacheMode {
-    /// Default cache behavior - use cached responses when fresh
+    /// Default cache behavior - use cached responses when fresh (default)
+    #[default]
     Default,
     /// No-store mode - don't use cache and don't store response
     NoStore,
@@ -91,9 +95,10 @@ pub enum CacheMode {
 /// Redirect handling mode
 ///
 /// Controls how HTTP redirects are processed.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 pub enum RedirectMode {
-    /// Follow redirects automatically
+    /// Follow redirects automatically (default)
+    #[default]
     Follow,
     /// Treat redirects as errors
     Error,
@@ -104,7 +109,7 @@ pub enum RedirectMode {
 /// Referrer policy for requests
 ///
 /// Controls what referrer information is sent with requests.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 pub enum ReferrerPolicy {
     /// Never send referrer
     NoReferrer,
@@ -118,7 +123,8 @@ pub enum ReferrerPolicy {
     SameOrigin,
     /// Send origin only when not downgrading
     StrictOrigin,
-    /// Combination of StrictOrigin and OriginWhenCrossOrigin
+    /// Combination of StrictOrigin and OriginWhenCrossOrigin (default)
+    #[default]
     StrictOriginWhenCrossOrigin,
     /// Always send full referrer (unsafe)
     UnsafeUrl,
@@ -127,22 +133,24 @@ pub enum ReferrerPolicy {
 /// Request priority levels
 ///
 /// Controls the priority of the request in the network scheduler.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 pub enum RequestPriority {
     /// High priority request
     High,
     /// Low priority request
     Low,
     /// Automatic priority (default)
+    #[default]
     Auto,
 }
 
 /// Response type classification
 ///
 /// Classifies the type of response based on CORS and error status.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 pub enum ResponseType {
-    /// Basic response - same-origin, non-error
+    /// Basic response - same-origin, non-error (default)
+    #[default]
     Basic,
     /// CORS response - cross-origin with proper CORS headers
     Cors,

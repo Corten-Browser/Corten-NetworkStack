@@ -197,7 +197,8 @@ mod cache_http_integration {
         // Then: Cached response has ETag
         let cached = cache.get(&request).await;
         assert!(cached.is_some());
-        let etag = cached.unwrap().response.headers.get("etag");
+        let cached_response = cached.unwrap();
+        let etag = cached_response.response.headers.get("etag");
         assert!(etag.is_some(), "ETag should be preserved in cache");
         assert_eq!(etag.unwrap(), "\"abc123\"");
 

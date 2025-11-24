@@ -10,7 +10,7 @@
 
 #[cfg(test)]
 mod cookie_http_integration {
-    use cookie_manager::{CookieStore, CookieJar, Cookie};
+    use cookie_manager::{CookieStore, CookieJar, CookieType as Cookie, parse_set_cookie};
     use http1_protocol::{Http1Client, Http1Config};
     use network_types::{NetworkRequest, NetworkResponse, HttpMethod};
     use url::Url;
@@ -21,7 +21,7 @@ mod cookie_http_integration {
     #[test]
     fn test_set_cookie_storage() {
         // Given: A cookie store (REAL component)
-        let cookie_store = CookieStore::new();
+        let mut cookie_store = CookieStore::new();
 
         // And: A response URL
         let url = Url::parse("http://example.com/login").unwrap();
@@ -44,7 +44,7 @@ mod cookie_http_integration {
     #[test]
     fn test_cookies_sent_with_requests() {
         // Given: A cookie store with stored cookies (REAL component)
-        let cookie_store = CookieStore::new();
+        let mut cookie_store = CookieStore::new();
         let url = Url::parse("http://example.com/").unwrap();
 
         // Store a cookie
@@ -67,7 +67,7 @@ mod cookie_http_integration {
     #[test]
     fn test_cookie_domain_matching() {
         // Given: A cookie store (REAL component)
-        let cookie_store = CookieStore::new();
+        let mut cookie_store = CookieStore::new();
 
         // When: Storing a cookie for example.com
         let url = Url::parse("http://example.com/").unwrap();
@@ -93,7 +93,7 @@ mod cookie_http_integration {
     #[test]
     fn test_cookie_path_matching() {
         // Given: A cookie store (REAL component)
-        let cookie_store = CookieStore::new();
+        let mut cookie_store = CookieStore::new();
 
         // When: Storing cookies with different paths
         let base_url = Url::parse("http://example.com/").unwrap();
@@ -123,7 +123,7 @@ mod cookie_http_integration {
     #[test]
     fn test_secure_cookie_enforcement() {
         // Given: A cookie store (REAL component)
-        let cookie_store = CookieStore::new();
+        let mut cookie_store = CookieStore::new();
 
         // When: Storing a Secure cookie
         let https_url = Url::parse("https://secure.example.com/").unwrap();
@@ -149,7 +149,7 @@ mod cookie_http_integration {
     #[test]
     fn test_httponly_cookie_storage() {
         // Given: A cookie store (REAL component)
-        let cookie_store = CookieStore::new();
+        let mut cookie_store = CookieStore::new();
 
         // When: Storing an HttpOnly cookie
         let url = Url::parse("http://example.com/").unwrap();
@@ -189,7 +189,7 @@ mod cookie_http_integration {
     #[test]
     fn test_cookie_persistence_across_requests() {
         // Given: A cookie store shared across requests (REAL component)
-        let cookie_store = CookieStore::new();
+        let mut cookie_store = CookieStore::new();
 
         // When: First request stores a cookie
         let login_url = Url::parse("http://example.com/login").unwrap();
@@ -215,7 +215,7 @@ mod cookie_http_integration {
     #[test]
     fn test_cookie_expiration() {
         // Given: A cookie store (REAL component)
-        let cookie_store = CookieStore::new();
+        let mut cookie_store = CookieStore::new();
         let url = Url::parse("http://example.com/").unwrap();
 
         // When: Storing an expired cookie
@@ -233,7 +233,7 @@ mod cookie_http_integration {
     #[test]
     fn test_cookie_store_clear() {
         // Given: A cookie store with cookies (REAL component)
-        let cookie_store = CookieStore::new();
+        let mut cookie_store = CookieStore::new();
         let url = Url::parse("http://example.com/").unwrap();
 
         // Store some cookies
@@ -259,7 +259,7 @@ mod cookie_http_integration {
     fn test_complete_cookie_http_flow() {
         // Given: Complete stack (REAL components)
         // 1. Cookie store for managing cookies
-        let cookie_store = CookieStore::new();
+        let mut cookie_store = CookieStore::new();
 
         // 2. HTTP client that uses cookie store
         let http_config = Http1Config {
