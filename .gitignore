@@ -24,9 +24,15 @@ orchestration/*.tmp
 orchestration/*.temp
 
 # Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
 orchestration/__pycache__/
 orchestration/**/__pycache__/
 orchestration/**/*.pyc
+
+# Orchestration resume context (generated at runtime)
+orchestration-resume-context.json
 
 # IDE files (if in orchestration dir)
 orchestration/.vscode/

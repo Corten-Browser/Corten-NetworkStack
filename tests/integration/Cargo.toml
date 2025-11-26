@@ -15,6 +15,7 @@ dns-resolver = { path = "../../components/dns_resolver" }
 tls-manager = { path = "../../components/tls_manager" }
 cookie-manager = { path = "../../components/cookie_manager" }
 http-cache = { path = "../../components/http_cache" }
+cors-validator = { path = "../../components/cors_validator" }
 http1-protocol = { path = "../../components/http1_protocol" }
 http2-protocol = { path = "../../components/http2_protocol" }
 http3-protocol = { path = "../../components/http3_protocol" }

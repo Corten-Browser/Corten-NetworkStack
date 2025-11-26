@@ -23,18 +23,10 @@ mod network_stack_integration {
     #[test]
     fn test_network_stack_creation() {
         // Given: Complete network configuration
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
+        let config = NetworkConfig::default();
 
         // When: Creating network stack (REAL component integrating ALL components)
-        let network_stack = NetworkStackImpl::new(config);
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // Then: Network stack is created successfully
         // All underlying components are initialized
@@ -45,16 +37,8 @@ mod network_stack_integration {
     #[tokio::test]
     async fn test_network_stack_http1_fetch() {
         // Given: Network stack configured (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // When: Fetching via HTTP/1.1
         let url = Url::parse("http://example.com/").unwrap();
@@ -98,16 +82,8 @@ mod network_stack_integration {
     #[tokio::test]
     async fn test_network_stack_websocket_connect() {
         // Given: Network stack (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // When: Connecting to WebSocket
         let ws_url = Url::parse("wss://echo.websocket.org/").unwrap();
@@ -131,19 +107,12 @@ mod network_stack_integration {
     #[tokio::test]
     async fn test_network_stack_webrtc_peer() {
         // Given: Network stack (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // When: Creating WebRTC peer connection
-        let rtc_config = Default::default(); // RtcConfiguration
+        // Note: RtcConfiguration would be used if create_rtc_peer_connection was called
+        // let rtc_config: RtcConfiguration = Default::default();
 
         // Note: Actual peer connection setup
         // let result = network_stack.create_rtc_peer_connection(rtc_config).await;
@@ -162,16 +131,8 @@ mod network_stack_integration {
     #[test]
     fn test_network_stack_status() {
         // Given: Network stack (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // When: Getting network status
         let status = network_stack.get_network_status();
@@ -190,16 +151,8 @@ mod network_stack_integration {
     #[tokio::test]
     async fn test_network_stack_cache_clear() {
         // Given: Network stack with cache (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let mut network_stack = NetworkStackImpl::new(config).unwrap();
 
         // When: Clearing cache
         let result = network_stack.clear_cache().await;
@@ -217,16 +170,8 @@ mod network_stack_integration {
     #[test]
     fn test_network_stack_cookie_store_access() {
         // Given: Network stack (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // When: Accessing cookie store
         let cookie_store = network_stack.cookie_store();
@@ -245,16 +190,8 @@ mod network_stack_integration {
     #[test]
     fn test_network_stack_cert_store_access() {
         // Given: Network stack (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // When: Accessing certificate store
         let cert_store = network_stack.cert_store();
@@ -299,16 +236,8 @@ mod network_stack_integration {
     #[tokio::test]
     async fn test_network_stack_shared_dns() {
         // Given: Network stack (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // When: Making requests to same hostname via different protocols
         let http_url = Url::parse("http://example.com/").unwrap();
@@ -328,16 +257,8 @@ mod network_stack_integration {
     #[test]
     fn test_network_stack_shared_tls() {
         // Given: Network stack with TLS config (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // Then: TLS configuration is shared across:
         // - HTTPS (http1/2/3_protocol)
@@ -356,16 +277,8 @@ mod network_stack_integration {
     #[test]
     fn test_network_stack_shared_cookies() {
         // Given: Network stack (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // Then: Cookie store is shared across:
         // - HTTP/1.1 requests (http1_protocol)
@@ -385,16 +298,8 @@ mod network_stack_integration {
     #[tokio::test]
     async fn test_network_stack_shared_cache() {
         // Given: Network stack with cache (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // Then: HTTP cache is shared across:
         // - HTTP/1.1 (http1_protocol)
@@ -414,16 +319,8 @@ mod network_stack_integration {
     #[tokio::test]
     async fn test_network_stack_error_handling() {
         // Given: Network stack (REAL components)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // When: Making request to invalid URL
         let invalid_url = Url::parse("http://invalid.nonexistent.domain/").unwrap();
@@ -471,16 +368,8 @@ mod network_stack_integration {
     #[tokio::test]
     async fn test_network_stack_complete_flow() {
         // Given: Complete network stack (ALL REAL COMPONENTS)
-        let config = NetworkConfig {
-            http: Default::default(),
-            websocket: Default::default(),
-            webrtc: Default::default(),
-            cache: Default::default(),
-            security: Default::default(),
-            proxy: Default::default(),
-            dns: Default::default(),
-        };
-        let network_stack = NetworkStackImpl::new(config);
+        let config = NetworkConfig::default();
+        let network_stack = NetworkStackImpl::new(config).unwrap();
 
         // Scenario: Complete request flow through entire system
         // When: Making HTTPS request

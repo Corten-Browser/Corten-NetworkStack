@@ -10,7 +10,7 @@
 
 #[cfg(test)]
 mod dns_tls_http_integration {
-    use dns_resolver::{DnsResolver, DnsCache};
+    use dns_resolver::{DnsResolver, DnsCache, StandardResolver, DohConfig};
     use tls_manager::{TlsConfig, CertificateStore, HstsStore};
     use http1_protocol::{Http1Client, Http1Config};
     use network_types::{NetworkRequest, HttpMethod};
@@ -24,8 +24,7 @@ mod dns_tls_http_integration {
     #[tokio::test]
     async fn test_dns_resolution_before_http_request() {
         // Given: A DNS resolver (REAL component)
-        let dns_cache = DnsCache::new();
-        let resolver = DnsResolver::new(dns_cache.clone());
+        let resolver = StandardResolver::new(None).expect("Failed to create resolver");
 
         // When: Resolving a hostname that HTTP client will use
         let hostname = "example.com";
@@ -67,7 +66,7 @@ mod dns_tls_http_integration {
     #[test]
     fn test_hsts_enforcement() {
         // Given: An HSTS store with a strict domain (REAL component)
-        let hsts_store = HstsStore::new();
+        let mut hsts_store = HstsStore::new();
         hsts_store.add_hsts_entry(
             "secure.example.com".to_string(),
             Duration::from_secs(31536000), // 1 year
@@ -101,8 +100,7 @@ mod dns_tls_http_integration {
     #[tokio::test]
     async fn test_http_client_with_dns_resolver() {
         // Given: DNS resolver and HTTP/1.1 client (REAL components)
-        let dns_cache = DnsCache::new();
-        let resolver = DnsResolver::new(dns_cache.clone());
+        let resolver = StandardResolver::new(None).expect("Failed to create resolver");
 
         let http_config = Http1Config {
             pool_size: 10,
@@ -148,8 +146,7 @@ mod dns_tls_http_integration {
     #[tokio::test]
     async fn test_dns_cache_reduces_lookups() {
         // Given: DNS cache and resolver (REAL components)
-        let dns_cache = DnsCache::new();
-        let resolver = DnsResolver::new(dns_cache.clone());
+        let resolver = StandardResolver::new(None).expect("Failed to create resolver");
 
         // When: Resolving the same hostname multiple times
         let hostname = "example.com";
@@ -195,8 +192,7 @@ mod dns_tls_http_integration {
     async fn test_complete_dns_tls_http_flow() {
         // Given: Complete stack (REAL components)
         // 1. DNS resolver for hostname resolution
-        let dns_cache = DnsCache::new();
-        let resolver = DnsResolver::new(dns_cache);
+        let resolver = StandardResolver::new(None).expect("Failed to create resolver");
 
         // 2. TLS config for secure connections
         let tls_config = TlsConfig::new()
@@ -240,7 +236,7 @@ mod dns_tls_http_integration {
     #[test]
     fn test_http_to_https_upgrade_with_hsts() {
         // Given: HSTS store with enforced domain (REAL component)
-        let hsts_store = HstsStore::new();
+        let mut hsts_store = HstsStore::new();
         hsts_store.add_hsts_entry(
             "bank.example.com".to_string(),
             Duration::from_secs(31536000),
@@ -273,8 +269,7 @@ mod dns_tls_http_integration {
     #[tokio::test]
     async fn test_dns_timeout_handling() {
         // Given: DNS resolver with timeout (REAL component)
-        let dns_cache = DnsCache::new();
-        let resolver = DnsResolver::new(dns_cache);
+        let resolver = StandardResolver::new(None).expect("Failed to create resolver");
 
         // When: Attempting to resolve with timeout
         let timeout = Duration::from_millis(100);

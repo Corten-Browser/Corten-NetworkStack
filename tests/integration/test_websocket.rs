@@ -298,7 +298,7 @@ mod websocket_integration {
         // Scenario: Complete WebSocket lifecycle
         // When: Connecting to WebSocket server
         let url = Url::parse("wss://echo.websocket.org/").unwrap();
-        let protocols = vec![];
+        let protocols: Vec<String> = vec![];
 
         // Note: Actual connection would happen here
         // let connection = ws_client.connect(url, protocols).await;
